@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <!-- Section 1: Uploading -->
+        <section id="upload-section" class="card">
+            <h1>AI Image Analyzer</h1>
+            <p>Select an image to see the magic happen.</p>
+            
+            <div class="drop-zone">
+                <label for="image-input" class="custom-file-upload">
+                    <span>Choose Image</span>
+                </label>
+                <input type="file" id="image-input" accept="image/*">
+                
+                <div id="preview-container" class="hidden">
+                    <img id="image-preview" src="" alt="Image Preview">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Results -->
+        <section id="results-section" class="card">
+            <h2>Analysis Results</h2>
+            <div id="results-content">
+                <p class="placeholder-text">The AI results will appear here once an image is processed...</p>
+                <!-- AI details will be injected here later -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
