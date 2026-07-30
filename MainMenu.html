@@ -11,104 +11,56 @@
 </head>
 <body class="dark">
   <header class="topbar">
-    <a class="logo" href="#" aria-label="PicRes trang chủ">
-      <span class="logo-mark" aria-hidden="true">✦</span>
-      <span>Pic<span>Res</span></span>
-    </a>
-    <nav aria-label="Điều hướng chính">
-      <a class="active" href="#gallery">My Gallery</a>
-      <a href="#showcase">Showcase</a>
-      <a href="#help">Help</a>
-    </nav>
+    <a class="logo" href="#" aria-label="Trang chủ PicRes"><span class="logo-mark" aria-hidden="true">✦</span><span>Pic<span>Res</span></span></a>
+    <nav aria-label="Điều hướng chính"><a class="active" href="#gallery">My Gallery</a><a href="#showcase">Showcase</a><a href="#help">Help</a></nav>
   </header>
 
   <main class="app-layout">
-    <section class="workspace" aria-label="AI image restoration workspace">
+    <section class="workspace" aria-label="Không gian phục hồi ảnh AI">
       <div class="section-heading">
-        <div>
-          <p class="eyebrow">AI IMAGE STUDIO</p>
-          <h1>Restore your image</h1>
-        </div>
-        <span class="status"><i></i> Ready to create</span>
+        <div><p class="eyebrow">AI IMAGE STUDIO</p><h1>Khôi phục ảnh của bạn</h1></div>
+        <span class="status" id="status"><i></i><span> Sẵn sàng</span></span>
       </div>
-
-      <label class="field-label" for="imageName">Image name</label>
-      <input class="text-field" type="text" id="imageName" placeholder="Enter image name...">
+      <label class="field-label" for="imageName">Tên ảnh</label>
+      <input class="text-field" type="text" id="imageName" placeholder="Nhập tên ảnh...">
 
       <div class="image-grid">
         <article class="image-card input-card">
-          <div class="card-header"><span>01</span><h2>Input image</h2></div>
+          <div class="card-header"><span>01</span><h2>Ảnh gốc</h2></div>
           <label class="upload-zone" id="uploadZone" for="imageUpload">
-            <input type="file" id="imageUpload" accept="image/*" hidden>
-            <div class="upload-placeholder">
-              <span class="upload-icon">↑</span>
-              <strong>Insert image</strong>
-              <small>Drag & drop or browse from your device</small>
-              <em>JPG, PNG, WEBP</em>
-            </div>
-            <div class="image-preview" id="imagePreview" hidden>
-              <img id="previewImage" alt="Ảnh đã tải lên">
-              <div class="image-meta">
-                <strong id="imageFileName"></strong>
-                <span id="imageFileDetails"></span>
-              </div>
-            </div>
+            <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/webp" hidden>
+            <div class="upload-placeholder"><span class="upload-icon">↑</span><strong>Thêm ảnh</strong><small>Kéo thả hoặc chọn từ thiết bị</small><em>JPG, PNG, WEBP · tối đa 10 MB</em></div>
+            <div class="image-preview" id="imagePreview" hidden><img id="previewImage" alt="Ảnh đã tải lên"><div class="image-meta"><strong id="imageFileName"></strong><span id="imageFileDetails"></span></div></div>
           </label>
         </article>
-
         <article class="image-card output-card">
-          <div class="card-header"><span>02</span><h2>AI output</h2></div>
-          <div class="output-zone">
-            <div class="sparkle">✦</div>
-            <strong>Your restored image</strong>
-            <small>will appear here after processing</small>
+          <div class="card-header"><span>02</span><h2>Kết quả AI</h2></div>
+          <div class="output-zone" id="outputZone">
+            <div class="output-placeholder" id="outputPlaceholder"><div class="sparkle">✦</div><strong>Ảnh đã phục hồi</strong><small>Sẽ xuất hiện ở đây sau khi xử lý</small></div>
+            <div class="output-result" id="outputResult" hidden><img id="restoredImage" alt="Ảnh đã được AI phục hồi"><span class="result-badge">AI restored</span></div>
           </div>
         </article>
       </div>
 
       <div class="action-row">
-        <button class="button primary" id="runImage"><span>✦</span> Run restoration</button>
-        <button class="button secondary" id="retryImage"><span>↻</span> Retry</button>
+        <button class="button primary" id="runImage" type="button"><span>✦</span> Run restoration</button>
+        <button class="button secondary" id="retryImage" type="button" disabled><span>↻</span> Retry</button>
+        <button class="button save" id="saveButton" type="button" disabled><span>↓</span> Lưu ảnh</button>
       </div>
+      <p class="action-message" id="actionMessage" role="status" aria-live="polite"></p>
 
       <section class="description-section">
-        <div class="label-row">
-          <label class="field-label" for="description">Description</label>
-          <span>AI-generated image details</span>
-        </div>
-        <textarea id="description" placeholder="Your image description will appear here..."></textarea>
-        <div class="action-row description-actions">
-          <button class="button primary" id="runDescription"><span>✦</span> Run description</button>
-          <button class="button secondary" id="retryDescription"><span>↻</span> Retry</button>
-          <button class="button save" id="saveButton"><span>↓</span> Save</button>
-        </div>
+        <div class="label-row"><label class="field-label" for="description">Ghi chú phục hồi</label><span>Ưu tiên ảnh lịch sử & văn hóa truyền thống</span></div>
+        <textarea id="description" readonly placeholder="Thông tin xử lý sẽ xuất hiện tại đây..."></textarea>
       </section>
     </section>
 
-    <aside class="chat-panel" aria-label="AI image assistant">
-      <div class="chat-heading">
-        <div class="assistant-avatar">✦</div>
-        <div><p>PicRes Assistant</p><small><i></i> Online</small></div>
-        <button class="more-button" aria-label="Tùy chọn chat">•••</button>
-      </div>
-      <div class="chat-content">
-        <div class="chat-orb">✦</div>
-        <h2>How can I help?</h2>
-        <p>Ask about the image you upload, its details, or how to get the best restoration.</p>
-        <div class="suggestions">
-          <button>What can be restored?</button>
-          <button>Describe this image</button>
-          <button>How does PicRes work?</button>
-        </div>
-      </div>
-      <div class="chat-input-wrap">
-        <input type="text" aria-label="Câu hỏi cho trợ lý" placeholder="Ask about your image...">
-        <button aria-label="Gửi câu hỏi">↑</button>
-      </div>
-      <p class="chat-note">AI assistant is ready when you are</p>
+    <aside class="chat-panel" aria-label="Trợ lý ảnh AI">
+      <div class="chat-heading"><div class="assistant-avatar">✦</div><div><p>PicRes Assistant</p><small><i></i> Sẵn sàng</small></div><button class="more-button" aria-label="Tùy chọn chat">•••</button></div>
+      <div class="chat-content"><div class="chat-orb">✦</div><h2>Khôi phục có chủ đích</h2><p>PicRes ưu tiên ảnh cũ, ảnh mờ, ảnh đen trắng và tư liệu lịch sử – văn hóa truyền thống.</p><div class="suggestions"><button type="button">Tải ảnh cũ hoặc ảnh đen trắng</button><button type="button">AI sẽ phục hồi chi tiết và tô màu</button><button type="button">Bạn có thể Retry để tạo kết quả mới</button></div></div>
+      <p class="chat-note">Không thêm chi tiết lịch sử không có trong ảnh gốc</p>
     </aside>
   </main>
-
   <button id="themeToggle" class="theme-toggle" aria-label="Chuyển sang giao diện sáng" title="Đổi giao diện"><span>☾</span></button>
   <script src="app.js"></script>
 </body>
