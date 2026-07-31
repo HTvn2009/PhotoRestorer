@@ -14,3 +14,5 @@ node server.js
 ```
 
 Ứng dụng dùng endpoint Image Edits với `gpt-image-2`. Ảnh được gửi từ trình duyệt đến backend cục bộ; backend mới gọi API, nên khóa không bị lộ ở frontend. Ảnh gốc và ảnh kết quả không được ghi vào thư mục dự án.
+
+TBD
