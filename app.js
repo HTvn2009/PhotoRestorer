@@ -11,50 +11,56 @@ const saveButton = document.getElementById('saveButton');
 const restoredImage = document.getElementById('restoredImage');
 const outputResult = document.getElementById('outputResult');
 const outputPlaceholder = document.getElementById('outputPlaceholder');
-const actionMessage = document.getElementById('actionMessage');
+const outputText = document.getElementById('outputText');
 const status = document.getElementById('status');
 const description = document.getElementById('description');
 const imageName = document.getElementById('imageName');
-const imageInfo = document.getElementById('imageInfo');
 const descriptionReload = document.getElementById('descriptionReload');
+const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
+const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
+const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
 
 let selectedFile = null;
 let restoredUrl = null;
 let isProcessing = false;
 
 themeButton.addEventListener('click', () => {
-  const isDark = document.body.classList.toggle('dark');
-  themeButton.querySelector('span').textContent = isDark ? 'Sun' : 'Moon';
-  themeButton.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+  const isLight = document.body.classList.toggle('light');
+  document.body.classList.toggle('dark', !isLight);
+  themeButton.querySelector('span').textContent = isLight ? '☀' : '☾';
+  themeButton.setAttribute('aria-label', isLight ? 'Chuyển sang giao diện tối' : 'Chuyển sang giao diện sáng');
 });
 
 function formatFileSize(bytes) {
-  return bytes < 1024 * 1024
-    ? `${(bytes / 1024).toFixed(bytes < 100 * 1024 ? 1 : 0)} KB`
-    : `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(bytes < 100 * 1024 ? 1 : 0)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function setStatus(message, processing = false) {
-  status.querySelector('span').textContent = message;
+  if (!status) return;
+  status.innerHTML = `<i></i> ${message}`;
   status.classList.toggle('processing', processing);
 }
 
 function clearResult() {
   if (restoredUrl) URL.revokeObjectURL(restoredUrl);
   restoredUrl = null;
-  restoredImage.removeAttribute('src');
-  outputResult.hidden = true;
-  outputPlaceholder.hidden = false;
+  if (restoredImage) restoredImage.removeAttribute('src');
+  if (outputResult) outputResult.hidden = true;
+  if (outputPlaceholder) outputPlaceholder.hidden = false;
+  if (outputText) outputText.textContent = 'will appear here after processing';
   retryButton.disabled = true;
   saveButton.disabled = true;
-  description.value = '';
+  if (description) description.value = '';
 }
 
 function showImage(file) {
   if (!file || !file.type.startsWith('image/')) return;
 
   if (file.size > 10 * 1024 * 1024) {
-    actionMessage.textContent = 'Please choose an image smaller than 10 MB.';
+    setStatus('Please choose a file smaller than 10 MB');
     return;
   }
 
@@ -64,11 +70,10 @@ function showImage(file) {
 
   previewImage.onload = () => {
     imageFileName.textContent = file.name;
-    imageFileDetails.textContent = `${formatFileSize(file.size)} - ${previewImage.naturalWidth} x ${previewImage.naturalHeight}px`;
+    imageFileDetails.textContent = `${formatFileSize(file.size)}  •  ${previewImage.naturalWidth} × ${previewImage.naturalHeight}px`;
     imagePreview.hidden = false;
     uploadZone.querySelector('.upload-placeholder').hidden = true;
-    actionMessage.textContent = 'Image is ready to restore.';
-    setStatus('Ready');
+    setStatus('Ready to create');
     URL.revokeObjectURL(imageUrl);
   };
 
@@ -77,7 +82,7 @@ function showImage(file) {
 
 async function restoreImage() {
   if (!selectedFile || isProcessing) {
-    if (!selectedFile) actionMessage.textContent = 'Choose an image before restoring.';
+    if (!selectedFile) setStatus('Choose an image before restoring');
     return;
   }
 
@@ -85,9 +90,8 @@ async function restoreImage() {
   clearResult();
   runButton.disabled = true;
   retryButton.disabled = true;
-  runButton.textContent = 'Restoring...';
-  actionMessage.textContent = 'AI is restoring the image.';
-  setStatus('Processing', true);
+  runButton.innerHTML = '<span>✦</span> Restoring...';
+  setStatus('Restoring image', true);
 
   try {
     const response = await fetch('/api/restore', {
@@ -96,7 +100,7 @@ async function restoreImage() {
       body: JSON.stringify({
         image: await fileToDataUrl(selectedFile),
         fileName: selectedFile.name,
-        title: [imageName.value.trim(), imageInfo.value.trim()].filter(Boolean).join(' - ')
+        title: imageName.value.trim()
       })
     });
     const result = await response.json();
@@ -106,6 +110,7 @@ async function restoreImage() {
     restoredUrl = URL.createObjectURL(new Blob([imageBytes], { type: result.mimeType || 'image/png' }));
     restoredImage.src = restoredUrl;
     outputPlaceholder.hidden = true;
+    outputText.textContent = 'Processed image ready';
     outputResult.hidden = false;
     retryButton.disabled = false;
     saveButton.disabled = false;
@@ -114,15 +119,14 @@ async function restoreImage() {
       'Only describe details that can be observed in the image.',
       'Origin, date, location, and related stories should be verified before publishing.'
     ].join('\n\n');
-    actionMessage.textContent = 'Restore complete. You can save the image or retry.';
-    setStatus('Complete');
+    setStatus('Restoration complete');
   } catch (error) {
-    actionMessage.textContent = error.message || 'Something went wrong while restoring the image.';
-    setStatus('Error');
+    setStatus(error.message || 'Restore failed');
+    if (outputText) outputText.textContent = error.message || 'Unable to restore the image.';
   } finally {
     isProcessing = false;
     runButton.disabled = false;
-    runButton.textContent = 'Restore Image';
+    runButton.innerHTML = '<span>✦</span> Run restoration';
     if (restoredUrl) retryButton.disabled = false;
   }
 }
@@ -147,6 +151,39 @@ function downloadResult() {
   link.remove();
 }
 
+function activateTab(target) {
+  const currentTarget = tabPanels.find(panel => !panel.hidden)?.dataset.panel || 'mainMenu';
+
+  if (currentTarget === target) {
+    return;
+  }
+
+  tabButtons.forEach(button => {
+    const isCurrent = button.dataset.target === target;
+    button.classList.toggle('active', isCurrent);
+    if (isCurrent) {
+      button.setAttribute('aria-current', 'page');
+    } else {
+      button.removeAttribute('aria-current');
+    }
+  });
+
+  tabPanels.forEach(panel => {
+    panel.hidden = panel.dataset.panel !== target;
+  });
+}
+
+function toggleHelpItem(button) {
+  const item = button.closest('.help-item');
+  const details = item.querySelector('.help-details');
+  const isOpen = !details.hidden;
+
+  details.hidden = isOpen;
+  button.setAttribute('aria-expanded', String(!isOpen));
+  const icon = button.querySelector('.help-icon');
+  icon.textContent = isOpen ? '+' : '−';
+}
+
 imageUpload.addEventListener('change', () => showImage(imageUpload.files[0]));
 runButton.addEventListener('click', restoreImage);
 retryButton.addEventListener('click', restoreImage);
@@ -157,14 +194,31 @@ descriptionReload.addEventListener('click', () => {
   }
 });
 
-['dragenter', 'dragover'].forEach(name => uploadZone.addEventListener(name, event => {
-  event.preventDefault();
-  uploadZone.classList.add('dragging');
-}));
+['dragenter', 'dragover'].forEach((eventName) => {
+  uploadZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadZone.classList.add('dragging');
+  });
+});
 
-['dragleave', 'drop'].forEach(name => uploadZone.addEventListener(name, event => {
-  event.preventDefault();
-  uploadZone.classList.remove('dragging');
-}));
+['dragleave', 'drop'].forEach((eventName) => {
+  uploadZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadZone.classList.remove('dragging');
+  });
+});
 
-uploadZone.addEventListener('drop', event => showImage(event.dataTransfer.files[0]));
+uploadZone.addEventListener('drop', (event) => showImage(event.dataTransfer.files[0]));
+
+tabButtons.forEach(button => {
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    activateTab(button.dataset.target);
+  });
+});
+
+helpQuestions.forEach(button => {
+  button.addEventListener('click', () => toggleHelpItem(button));
+});
+
+activateTab('mainMenu');
