@@ -263,7 +263,11 @@ textarea::placeholder { color: #737584; }
 .image-meta strong { font-size: 11px; }
 .image-meta span { margin-top: 3px; color: #dddce5; font-size: 10px; }
 
-.output-zone { background: radial-gradient(circle at 50% 35%, #292449, transparent 57%); }
+.output-zone {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #292449, transparent 57%);
+}
 .sparkle { color: #c4b8ff; background: #28223f; font-size: 25px; }
 
 .output-result {
@@ -272,9 +276,10 @@ textarea::placeholder { color: #737584; }
 }
 
 .output-result img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .result-badge {
