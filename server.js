@@ -2,7 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = __dirname;
+const ROOT = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT || 3000);
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
@@ -70,9 +70,9 @@ const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   if (request.method === 'POST' && url.pathname === '/api/restore') return restore(request, response);
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
-  const requested = url.pathname === '/' ? 'MainMenu.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
+  const requested = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
   const allowedFiles = new Set([
-    'MainMenu.html',
+    'index.html',
     'app.js',
     'style.css',
     'option-a.html',
