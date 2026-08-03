@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 
 function sendJson(response, status, body) {
