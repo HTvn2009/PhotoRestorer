@@ -1,3 +1,5 @@
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.statusCode = 405;
@@ -33,10 +35,10 @@ module.exports = async function handler(req, res) {
   }
 
   const bytes = Buffer.from(match[2], 'base64');
-  if (bytes.length > 10 * 1024 * 1024) {
+  if (bytes.length > MAX_IMAGE_BYTES) {
     res.statusCode = 413;
     res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'Image exceeds 10 MB limit' }));
+    return res.end(JSON.stringify({ error: 'Image exceeds the 3 MB Vercel limit' }));
   }
 
   const extension = match[1] === 'image/jpeg' ? 'jpg' : match[1].split('/')[1];

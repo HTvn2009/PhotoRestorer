@@ -1,28 +1,31 @@
-const themeButton = document.getElementById('themeToggle');
-const uploadZone = document.getElementById('uploadZone');
-const imageUpload = document.getElementById('imageUpload');
-const imagePreview = document.getElementById('imagePreview');
-const previewImage = document.getElementById('previewImage');
-const imageFileName = document.getElementById('imageFileName');
-const imageFileDetails = document.getElementById('imageFileDetails');
-const runButton = document.getElementById('runImage');
-const retryButton = document.getElementById('retryImage');
-const saveButton = document.getElementById('saveButton');
-const restoredImage = document.getElementById('restoredImage');
-const outputResult = document.getElementById('outputResult');
-const outputPlaceholder = document.getElementById('outputPlaceholder');
-const outputText = document.getElementById('outputText');
-const status = document.getElementById('status');
-const description = document.getElementById('description');
-const imageName = document.getElementById('imageName');
-const descriptionReload = document.getElementById('descriptionReload');
-const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
-const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
-const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
+if (typeof document === 'undefined') {
+  console.warn('Skipping browser UI bootstrap because document is unavailable in this runtime.');
+} else {
+  const themeButton = document.getElementById('themeToggle');
+  const uploadZone = document.getElementById('uploadZone');
+  const imageUpload = document.getElementById('imageUpload');
+  const imagePreview = document.getElementById('imagePreview');
+  const previewImage = document.getElementById('previewImage');
+  const imageFileName = document.getElementById('imageFileName');
+  const imageFileDetails = document.getElementById('imageFileDetails');
+  const runButton = document.getElementById('runImage');
+  const retryButton = document.getElementById('retryImage');
+  const saveButton = document.getElementById('saveButton');
+  const restoredImage = document.getElementById('restoredImage');
+  const outputResult = document.getElementById('outputResult');
+  const outputPlaceholder = document.getElementById('outputPlaceholder');
+  const outputText = document.getElementById('outputText');
+  const status = document.getElementById('status');
+  const description = document.getElementById('description');
+  const imageName = document.getElementById('imageName');
+  const descriptionReload = document.getElementById('descriptionReload');
+  const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
+  const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
+  const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
 
-let selectedFile = null;
-let restoredUrl = null;
-let isProcessing = false;
+  let selectedFile = null;
+  let restoredUrl = null;
+  let isProcessing = false;
 
 themeButton.addEventListener('click', () => {
   const isLight = document.body.classList.toggle('light');
@@ -59,8 +62,8 @@ function clearResult() {
 function showImage(file) {
   if (!file || !file.type.startsWith('image/')) return;
 
-  if (file.size > 10 * 1024 * 1024) {
-    setStatus('Please choose a file smaller than 10 MB');
+  if (file.size > 3 * 1024 * 1024) {
+    setStatus('Please choose a file smaller than 3 MB');
     return;
   }
 
@@ -221,4 +224,5 @@ helpQuestions.forEach(button => {
   button.addEventListener('click', () => toggleHelpItem(button));
 });
 
-activateTab('mainMenu');
+  activateTab('mainMenu');
+}
