@@ -167,6 +167,7 @@ textarea {
 }
 
 .text-field { height: 47px; padding: 0 15px; margin-bottom: 27px; }
+.context-field { min-height: 76px; padding: 12px 15px; margin: 0 0 27px; resize: vertical; }
 
 .text-field:focus,
 textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #8d6bff20; }
@@ -322,6 +323,17 @@ textarea::placeholder { color: #737584; }
 
 textarea { display: block; min-height: 135px; padding: 15px; line-height: 1.5; resize: vertical; }
 .description-actions { margin-bottom: 0; }
+
+.analysis-card { display: grid; gap: 15px; margin-top: 14px; padding: 17px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.analysis-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.analysis-card h3 { margin: 0 0 7px; font-size: 12px; }
+.analysis-card ul { display: grid; gap: 6px; margin: 0; padding-left: 19px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.analysis-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.analysis-heading strong { font-size: 14px; }
+.analysis-heading span { padding: 4px 8px; color: var(--accent-2); background: #8d6bff1a; border-radius: 12px; font-size: 11px; }
+.analysis-warning { padding: 10px 12px; color: #f1c987; background: #d69f2714; border: 1px solid #d69f2740; border-radius: 8px; }
+.analysis-warning p + p { margin-top: 6px; }
+.source-note { font-size: 12px !important; }
 
 .chat-heading { display: flex; align-items: center; gap: 10px; }
 

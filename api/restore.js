@@ -50,7 +50,7 @@ module.exports = async function handler(req, res) {
   form.append('size', 'auto');
   form.append('quality', 'medium');
   form.append('output_format', 'png');
-  form.append('prompt', payload.title ? `Image title: ${String(payload.title).slice(0, 120)}` : 'Restore this image');
+  form.append('prompt', `Restore this uploaded photograph with high fidelity. It may be an old, blurry, faded, damaged, black-and-white, historical, or traditional cultural image. Upscale it, improve sharpness and clarity, reduce noise and artifacts, and colorize naturally when the source is monochrome. Preserve the original subject identity, composition, facial features, period clothing, architecture, traditional artifacts, text, and cultural context. Do not invent people, objects, symbols, lettering, landmarks, or historical claims. Use conservative, plausible period-appropriate color when exact colors are unknowable. ${payload.title ? `Image title: ${String(payload.title).slice(0, 120)}.` : ''}`);
 
   try {
     const aiResponse = await fetch('https://api.openai.com/v1/images/edits', {

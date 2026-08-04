@@ -18,7 +18,17 @@ if (typeof document === 'undefined') {
   const status = document.getElementById('status');
   const description = document.getElementById('description');
   const imageName = document.getElementById('imageName');
+  const imageContext = document.getElementById('imageContext');
   const descriptionReload = document.getElementById('descriptionReload');
+  const analysisCard = document.getElementById('analysisCard');
+  const analysisCategory = document.getElementById('analysisCategory');
+  const analysisConfidence = document.getElementById('analysisConfidence');
+  const analysisIdentification = document.getElementById('analysisIdentification');
+  const observedDetails = document.getElementById('observedDetails');
+  const historicalContextWrap = document.getElementById('historicalContextWrap');
+  const historicalContext = document.getElementById('historicalContext');
+  const analysisWarnings = document.getElementById('analysisWarnings');
+  const sourceNote = document.getElementById('sourceNote');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
@@ -26,12 +36,13 @@ if (typeof document === 'undefined') {
   let selectedFile = null;
   let restoredUrl = null;
   let isProcessing = false;
+  let isDescribing = false;
 
 themeButton.addEventListener('click', () => {
   const isLight = document.body.classList.toggle('light');
   document.body.classList.toggle('dark', !isLight);
   themeButton.querySelector('span').textContent = isLight ? '☀' : '☾';
-  themeButton.setAttribute('aria-label', isLight ? 'Chuyển sang giao diện tối' : 'Chuyển sang giao diện sáng');
+  themeButton.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
 });
 
 function formatFileSize(bytes) {
@@ -57,6 +68,7 @@ function clearResult() {
   retryButton.disabled = true;
   saveButton.disabled = true;
   if (description) description.value = '';
+  if (analysisCard) analysisCard.hidden = true;
 }
 
 function showImage(file) {
@@ -117,12 +129,8 @@ async function restoreImage() {
     outputResult.hidden = false;
     retryButton.disabled = false;
     saveButton.disabled = false;
-    description.value = [
-      'The image was restored with a focus on clarity, noise reduction, and balanced color.',
-      'Only describe details that can be observed in the image.',
-      'Origin, date, location, and related stories should be verified before publishing.'
-    ].join('\n\n');
     setStatus('Restoration complete');
+    await describeImage();
   } catch (error) {
     setStatus(error.message || 'Restore failed');
     if (outputText) outputText.textContent = error.message || 'Unable to restore the image.';
@@ -131,6 +139,60 @@ async function restoreImage() {
     runButton.disabled = false;
     runButton.innerHTML = '<span>✦</span> Run restoration';
     if (restoredUrl) retryButton.disabled = false;
+  }
+}
+
+function formatCategory(category) {
+  return ({ historical: 'Historical image', cultural: 'Cultural content', artifact: 'Artifact / object', landmark: 'Landmark / architecture', people: 'People in image', general: 'General image' })[category] || 'Image content';
+}
+
+function renderAnalysis(analysis) {
+  description.value = analysis.description;
+  analysisCategory.textContent = formatCategory(analysis.category);
+  analysisConfidence.textContent = `Confidence: ${{ low: 'low', medium: 'medium', high: 'high' }[analysis.identification.confidence] || 'unknown'}`;
+  analysisIdentification.textContent = analysis.identification.candidate
+    ? `${analysis.identification.candidate}. ${analysis.identification.reason}`
+    : analysis.identification.reason;
+  observedDetails.replaceChildren(...analysis.observedDetails.map(detail => {
+    const item = document.createElement('li');
+    item.textContent = detail;
+    return item;
+  }));
+  historicalContextWrap.hidden = !analysis.historicalContext;
+  historicalContext.textContent = analysis.historicalContext;
+  analysisWarnings.hidden = !analysis.warnings.length;
+  analysisWarnings.replaceChildren(...analysis.warnings.map(warning => {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = warning;
+    return paragraph;
+  }));
+  sourceNote.textContent = analysis.sourceSearchRecommended
+    ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
+    : 'This description does not assert origin, date, or related stories without supporting evidence.';
+  analysisCard.hidden = false;
+}
+
+async function describeImage() {
+  if (!selectedFile || isDescribing) return;
+  isDescribing = true;
+  descriptionReload.disabled = true;
+  descriptionReload.innerHTML = '<span>✦</span> Analyzing...';
+  if (description) description.value = 'Analyzing the image for historical and cultural context...';
+  try {
+    const response = await fetch('/api/describe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: await fileToDataUrl(selectedFile), title: imageName.value.trim(), context: imageContext.value.trim() })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Unable to analyze the image.');
+    renderAnalysis(result.analysis);
+  } catch (error) {
+    if (description) description.value = `Unable to create a description: ${error.message}`;
+    setStatus('Image restored, but its description could not be analyzed');
+  } finally {
+    isDescribing = false;
+    descriptionReload.disabled = false;
+    descriptionReload.innerHTML = '<span>✦</span> Analyze again';
   }
 }
 
@@ -192,9 +254,7 @@ runButton.addEventListener('click', restoreImage);
 retryButton.addEventListener('click', restoreImage);
 saveButton.addEventListener('click', downloadResult);
 descriptionReload.addEventListener('click', () => {
-  if (restoredUrl) {
-    description.value = 'Description reloaded. Verify origin, date, location, and related stories before publishing.';
-  }
+  describeImage();
 });
 
 ['dragenter', 'dragover'].forEach((eventName) => {
