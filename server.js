@@ -22,6 +22,28 @@ const descriptionSchema = {
   required: ['category', 'observedDetails', 'identification', 'description', 'historicalContext', 'warnings', 'humanCheck', 'sourceSearchRecommended']
 };
 
+function parseDescribeResponse(aiResult) {
+  if (aiResult?.output_parsed && typeof aiResult.output_parsed === 'object') {
+    return aiResult.output_parsed;
+  }
+
+  if (typeof aiResult?.output_text === 'string') {
+    return JSON.parse(aiResult.output_text);
+  }
+
+  const output = Array.isArray(aiResult?.output) ? aiResult.output : [];
+  for (const item of output) {
+    const textBlocks = Array.isArray(item?.content) ? item.content : [];
+    for (const block of textBlocks) {
+      const text = typeof block?.text === 'string' ? block.text : typeof block?.output_text === 'string' ? block.output_text : '';
+      if (!text) continue;
+      return JSON.parse(text);
+    }
+  }
+
+  return null;
+}
+
 function sendJson(response, status, body) {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   response.end(JSON.stringify(body));
@@ -94,8 +116,16 @@ async function describe(request, response) {
     });
     const aiResult = await aiResponse.json();
     if (!aiResponse.ok) return sendJson(response, aiResponse.status, { error: aiResult?.error?.message || 'The AI service could not analyze the image.' });
-    if (!aiResult.output_text) return sendJson(response, 502, { error: 'The AI service did not return a description.' });
-    return sendJson(response, 200, { analysis: JSON.parse(aiResult.output_text) });
+
+    let analysis;
+    try {
+      analysis = parseDescribeResponse(aiResult);
+    } catch (error) {
+      return sendJson(response, 502, { error: 'The AI service returned a malformed description payload.' });
+    }
+
+    if (!analysis) return sendJson(response, 502, { error: 'The AI service did not return a description.' });
+    return sendJson(response, 200, { analysis });
   } catch (error) {
     console.error('Describe error:', error);
     return sendJson(response, 500, { error: error.message || 'An internal error occurred while describing the image.' });

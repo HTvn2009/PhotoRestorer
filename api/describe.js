@@ -25,6 +25,28 @@ const descriptionSchema = {
   required: ['category', 'observedDetails', 'identification', 'description', 'historicalContext', 'warnings', 'humanCheck', 'sourceSearchRecommended']
 };
 
+function parseDescribeResponse(aiResult) {
+  if (aiResult?.output_parsed && typeof aiResult.output_parsed === 'object') {
+    return aiResult.output_parsed;
+  }
+
+  if (typeof aiResult?.output_text === 'string') {
+    return JSON.parse(aiResult.output_text);
+  }
+
+  const output = Array.isArray(aiResult?.output) ? aiResult.output : [];
+  for (const item of output) {
+    const textBlocks = Array.isArray(item?.content) ? item.content : [];
+    for (const block of textBlocks) {
+      const text = typeof block?.text === 'string' ? block.text : typeof block?.output_text === 'string' ? block.output_text : '';
+      if (!text) continue;
+      return JSON.parse(text);
+    }
+  }
+
+  return null;
+}
+
 function sendJson(res, status, body) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -85,8 +107,16 @@ module.exports = async function handler(req, res) {
     });
     const aiResult = await aiResponse.json();
     if (!aiResponse.ok) return sendJson(res, aiResponse.status, { error: aiResult?.error?.message || 'AI service failed' });
-    if (!aiResult.output_text) return sendJson(res, 502, { error: 'AI did not return a description' });
-    return sendJson(res, 200, { analysis: JSON.parse(aiResult.output_text) });
+
+    let analysis;
+    try {
+      analysis = parseDescribeResponse(aiResult);
+    } catch (error) {
+      return sendJson(res, 502, { error: 'AI returned a malformed description payload' });
+    }
+
+    if (!analysis) return sendJson(res, 502, { error: 'AI did not return a description' });
+    return sendJson(res, 200, { analysis });
   } catch (error) {
     return sendJson(res, 500, { error: error.message || 'Internal server error' });
   }
