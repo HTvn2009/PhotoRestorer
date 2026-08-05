@@ -17,12 +17,16 @@ const descriptionSchema = {
       required: ['candidate', 'confidence', 'reason']
     },
     description: { type: 'string' },
+    origin: { type: 'string' },
+    buildPeriod: { type: 'string' },
+    purpose: { type: 'string' },
+    significance: { type: 'string' },
     historicalContext: { type: 'string' },
     warnings: { type: 'array', items: { type: 'string' } },
     humanCheck: { type: 'boolean' },
     sourceSearchRecommended: { type: 'boolean' }
   },
-  required: ['category', 'observedDetails', 'identification', 'description', 'historicalContext', 'warnings', 'humanCheck', 'sourceSearchRecommended']
+  required: ['category', 'observedDetails', 'identification', 'description', 'origin', 'buildPeriod', 'purpose', 'significance', 'historicalContext', 'warnings', 'humanCheck', 'sourceSearchRecommended']
 };
 
 function parseDescribeResponse(aiResult) {
@@ -79,6 +83,8 @@ module.exports = async function handler(req, res) {
     'Respond in English using the supplied JSON schema.',
     'First classify the image. Describe only visual evidence visible in the original image.',
     'Focus the output on the actual content of the image: the main subject, visible objects or artifacts, architecture or landmarks, people, clothing or gestures, and the scene context. Emphasize what is present in the picture rather than technical photo characteristics.',
+    'Structure the answer in a Britannica-style editorial summary. Populate the fields description, origin, buildPeriod, purpose, significance, and historicalContext with concise, evidence-based prose only when there is direct support from the image or clearly stated user context.',
+    'If the image appears to show a landmark, architecture, object, or cultural site, provide origin, buildPeriod, purpose, and significance only when they are visually supported or explicitly mentioned by the user. Otherwise, leave the field as an empty string and rely on warnings and humanCheck to mark uncertainty.',
     'Do not include technical details such as color palette, brightness, contrast, image size, pixel dimensions, cropping, sharpening, or restoration quality unless they are directly relevant to interpretation.',
     'Do not identify a person, origin, date, location, event, artifact, landmark, or cultural tradition as fact unless it is directly supported by visible evidence or user-provided context.',
     'For uncertain identification, use cautious wording, set low or medium confidence, add a warning, and set humanCheck to true.',

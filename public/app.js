@@ -24,7 +24,16 @@ if (typeof document === 'undefined') {
   const analysisCategory = document.getElementById('analysisCategory');
   const analysisConfidence = document.getElementById('analysisConfidence');
   const analysisIdentification = document.getElementById('analysisIdentification');
+  const analysisDescription = document.getElementById('analysisDescription');
   const observedDetails = document.getElementById('observedDetails');
+  const originWrap = document.getElementById('originWrap');
+  const originText = document.getElementById('originText');
+  const buildPeriodWrap = document.getElementById('buildPeriodWrap');
+  const buildPeriodText = document.getElementById('buildPeriodText');
+  const purposeWrap = document.getElementById('purposeWrap');
+  const purposeText = document.getElementById('purposeText');
+  const significanceWrap = document.getElementById('significanceWrap');
+  const significanceText = document.getElementById('significanceText');
   const historicalContextWrap = document.getElementById('historicalContextWrap');
   const historicalContext = document.getElementById('historicalContext');
   const analysisWarnings = document.getElementById('analysisWarnings');
@@ -147,21 +156,30 @@ function formatCategory(category) {
 }
 
 function renderAnalysis(analysis) {
-  description.value = analysis.description;
+  description.value = analysis.description || '';
   analysisCategory.textContent = formatCategory(analysis.category);
   analysisConfidence.textContent = `Confidence: ${{ low: 'low', medium: 'medium', high: 'high' }[analysis.identification.confidence] || 'unknown'}`;
   analysisIdentification.textContent = analysis.identification.candidate
     ? `${analysis.identification.candidate}. ${analysis.identification.reason}`
     : analysis.identification.reason;
-  observedDetails.replaceChildren(...analysis.observedDetails.map(detail => {
+  analysisDescription.textContent = analysis.description || 'No verified summary available.';
+  observedDetails.replaceChildren(...(analysis.observedDetails || []).map(detail => {
     const item = document.createElement('li');
     item.textContent = detail;
     return item;
   }));
+  originWrap.hidden = !analysis.origin;
+  originText.textContent = analysis.origin || '';
+  buildPeriodWrap.hidden = !analysis.buildPeriod;
+  buildPeriodText.textContent = analysis.buildPeriod || '';
+  purposeWrap.hidden = !analysis.purpose;
+  purposeText.textContent = analysis.purpose || '';
+  significanceWrap.hidden = !analysis.significance;
+  significanceText.textContent = analysis.significance || '';
   historicalContextWrap.hidden = !analysis.historicalContext;
-  historicalContext.textContent = analysis.historicalContext;
+  historicalContext.textContent = analysis.historicalContext || '';
   analysisWarnings.hidden = !analysis.warnings.length;
-  analysisWarnings.replaceChildren(...analysis.warnings.map(warning => {
+  analysisWarnings.replaceChildren(...(analysis.warnings || []).map(warning => {
     const paragraph = document.createElement('p');
     paragraph.textContent = warning;
     return paragraph;
