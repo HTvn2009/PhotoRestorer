@@ -78,6 +78,8 @@ module.exports = async function handler(req, res) {
     'You analyze photographs for a cultural and historical photo-restoration product.',
     'Respond in English using the supplied JSON schema.',
     'First classify the image. Describe only visual evidence visible in the original image.',
+    'Focus the output on the actual content of the image: the main subject, visible objects or artifacts, architecture or landmarks, people, clothing or gestures, and the scene context. Emphasize what is present in the picture rather than technical photo characteristics.',
+    'Do not include technical details such as color palette, brightness, contrast, image size, pixel dimensions, cropping, sharpening, or restoration quality unless they are directly relevant to interpretation.',
     'Do not identify a person, origin, date, location, event, artifact, landmark, or cultural tradition as fact unless it is directly supported by visible evidence or user-provided context.',
     'For uncertain identification, use cautious wording, set low or medium confidence, add a warning, and set humanCheck to true.',
     'For non-famous people, never infer identity, private information, or sensitive traits. For general images, keep the description short.',
