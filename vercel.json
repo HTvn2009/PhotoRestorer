@@ -3,6 +3,23 @@
   "functions": {
     "api/restore.js": {
       "maxDuration": 180
+    },
+    "api/describe.js": {
+      "maxDuration": 180
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/restore",
+      "destination": "/api/restore.js"
+    },
+    {
+      "source": "/api/describe",
+      "destination": "/api/describe.js"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
 }
