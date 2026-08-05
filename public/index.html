@@ -65,6 +65,23 @@
             <div class="sparkle" id="resultMark">✦</div>
             <strong id="outputPlaceholder">Your restored image</strong>
             <small id="outputText">will appear here after processing</small>
+            <div class="output-progress" id="outputProgress" hidden aria-live="polite">
+              <div class="progress-header">
+                <span id="progressPercent">0%</span>
+                <strong id="progressTitle">Preparing image</strong>
+              </div>
+              <div class="progress-track" aria-hidden="true">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+              <ol class="progress-steps" id="progressSteps">
+                <li>Analyze original image</li>
+                <li>Repair visible damage</li>
+                <li>Recover detail and sharpness</li>
+                <li>Colorize naturally</li>
+                <li>Balance tone and realism</li>
+                <li>Finalize restored PNG</li>
+              </ol>
+            </div>
             <div class="output-result" id="outputResult" hidden>
               <img id="restoredImage" alt="Image restored">
               <span class="result-badge">Restored</span>

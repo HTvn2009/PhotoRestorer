@@ -6,6 +6,16 @@ const ROOT = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT || 3000);
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const RESTORE_PROMPT = [
+  'Restore this uploaded image by following these steps in order:',
+  '1. Analyze the original image and preserve its composition, subject identity, facial features, text, clothing, architecture, artifacts, and cultural or historical context.',
+  '2. Repair visible damage such as scratches, dust, stains, fading, blur, compression artifacts, and torn or worn areas without inventing missing people, objects, symbols, lettering, landmarks, or historical details.',
+  '3. Improve clarity with conservative sharpening, denoising, contrast correction, exposure balancing, and detail recovery.',
+  '4. Colorize the image as a required step. If the source is black-and-white, sepia, or faded, produce a natural full-color version. If the source already has color, refresh and correct the colors so the final output still looks naturally colorized.',
+  '5. Use plausible, period-appropriate, culturally respectful colors when exact colors are unknowable. Keep skin tones, clothing, materials, landscape, architecture, and artifacts realistic rather than stylized.',
+  '6. Finalize as a clean restored PNG that looks like the same photograph, not a newly invented scene.',
+  'The final image must include natural colorization and must not remain black-and-white or sepia unless the uploaded subject itself visibly requires monochrome markings.'
+].join(' ');
 const descriptionSchema = {
   type: 'object',
   additionalProperties: false,
@@ -83,7 +93,7 @@ async function restore(request, response) {
     form.append('size', 'auto');
     form.append('quality', 'medium');
     form.append('output_format', 'png');
-    form.append('prompt', `Restore this uploaded photograph with high fidelity. It may be an old, blurry, faded, damaged, black-and-white, historical, or traditional cultural image. Upscale it, improve sharpness and clarity, reduce noise and artifacts, and colorize naturally when the source is monochrome. Preserve the original subject identity, composition, facial features, period clothing, architecture, traditional artifacts, text, and cultural context. Do not invent people, objects, symbols, lettering, landmarks, or historical claims. Use conservative, plausible period-appropriate color when exact colors are unknowable. ${payload.title ? `Image title: ${String(payload.title).slice(0, 120)}.` : ''}`);
+    form.append('prompt', `${RESTORE_PROMPT} ${payload.title ? `Image title: ${String(payload.title).slice(0, 120)}.` : ''}`);
     const aiResponse = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }, body: form });
     const aiResult = await aiResponse.json();
     if (!aiResponse.ok) return sendJson(response, aiResponse.status, { error: aiResult?.error?.message || 'The AI service could not process the image.' });

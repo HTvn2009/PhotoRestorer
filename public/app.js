@@ -114,7 +114,7 @@ async function restoreImage() {
   runButton.disabled = true;
   retryButton.disabled = true;
   runButton.innerHTML = '<span>✦</span> Restoring...';
-  setStatus('Restoring image', true);
+  setStatus('Repairing, enhancing, and colorizing image', true);
 
   try {
     const response = await fetch('/api/restore', {
@@ -133,7 +133,7 @@ async function restoreImage() {
     restoredUrl = URL.createObjectURL(new Blob([imageBytes], { type: result.mimeType || 'image/png' }));
     restoredImage.src = restoredUrl;
     outputPlaceholder.hidden = true;
-    outputText.textContent = 'Processed image ready';
+    outputText.textContent = 'Restored and colorized image ready';
     outputResult.hidden = false;
     retryButton.disabled = false;
     saveButton.disabled = false;

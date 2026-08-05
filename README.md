@@ -1,6 +1,8 @@
 # PicRes AI Restoration
 
-PicRes restores photographs with the OpenAI Images Edits API and analyzes historical or cultural context with the Responses API. The browser runs the interface; API routes run on the server so the API key remains private.
+PicRes restores and colorizes photographs with the OpenAI Images Edits API and analyzes historical or cultural context with the Responses API. The browser runs the interface; API routes run on the server so the API key remains private.
+
+Restoration follows a fixed workflow: preserve the original subject and composition, repair visible damage, improve clarity, colorize the image naturally, and keep the final PNG faithful to the uploaded photo.
 
 After restoration, PicRes calls `POST /api/describe` to classify the original image and return observed details, a cautious identification, confidence level, and verification warnings. It does not invent sources or assert an origin, date, location, or identity without evidence.
 
