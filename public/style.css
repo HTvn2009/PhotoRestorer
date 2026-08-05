@@ -332,8 +332,6 @@ textarea { display: block; min-height: 135px; padding: 15px; line-height: 1.5; r
 .analysis-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .analysis-heading strong { font-size: 15px; }
 .analysis-heading span { padding: 4px 8px; color: var(--accent-2); background: #8d6bff1a; border-radius: 12px; font-size: 11px; }
-.analysis-warning { padding: 10px 12px; color: #f1c987; background: #d69f2714; border: 1px solid #d69f2740; border-radius: 8px; }
-.analysis-warning p + p { margin-top: 6px; }
 .source-note { font-size: 12px !important; color: var(--muted) !important; }
 
 .chat-heading { display: flex; align-items: center; gap: 10px; }

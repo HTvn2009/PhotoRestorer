@@ -36,7 +36,6 @@ if (typeof document === 'undefined') {
   const significanceText = document.getElementById('significanceText');
   const historicalContextWrap = document.getElementById('historicalContextWrap');
   const historicalContext = document.getElementById('historicalContext');
-  const analysisWarnings = document.getElementById('analysisWarnings');
   const sourceNote = document.getElementById('sourceNote');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
@@ -178,12 +177,6 @@ function renderAnalysis(analysis) {
   significanceText.textContent = analysis.significance || '';
   historicalContextWrap.hidden = !analysis.historicalContext;
   historicalContext.textContent = analysis.historicalContext || '';
-  analysisWarnings.hidden = !analysis.warnings.length;
-  analysisWarnings.replaceChildren(...(analysis.warnings || []).map(warning => {
-    const paragraph = document.createElement('p');
-    paragraph.textContent = warning;
-    return paragraph;
-  }));
   sourceNote.textContent = analysis.sourceSearchRecommended
     ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
     : 'This description does not assert origin, date, or related stories without supporting evidence.';
