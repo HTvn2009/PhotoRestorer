@@ -164,6 +164,7 @@ function clearResult() {
   retryButton.disabled = true;
   saveButton.disabled = true;
   if (description) description.value = '';
+  if (description) description.readOnly = true;
   if (analysisCard) analysisCard.hidden = true;
 }
 
@@ -256,6 +257,7 @@ function formatCategory(category) {
 
 function renderAnalysis(analysis) {
   description.value = analysis.description || '';
+  description.readOnly = false;
   analysisCategory.textContent = formatCategory(analysis.category);
   analysisConfidence.textContent = `Confidence: ${{ low: 'low', medium: 'medium', high: 'high' }[analysis.identification.confidence] || 'unknown'}`;
   analysisIdentification.textContent = analysis.identification.candidate
@@ -299,6 +301,7 @@ async function describeImage() {
     renderAnalysis(result.analysis);
   } catch (error) {
     if (description) description.value = `Unable to create a description: ${error.message}`;
+    if (description) description.readOnly = false;
     setStatus('Image restored, but its description could not be analyzed');
   } finally {
     isDescribing = false;
@@ -365,7 +368,10 @@ async function runGalleryStore(mode, handler) {
 async function readSavedGallery() {
   try {
     const items = await runGalleryStore('readonly', store => store.getAll());
-    return items.sort((first, second) => new Date(second.savedAt) - new Date(first.savedAt));
+    return items.sort((first, second) => {
+      if (Boolean(first.favorite) !== Boolean(second.favorite)) return first.favorite ? -1 : 1;
+      return new Date(second.savedAt) - new Date(first.savedAt);
+    });
   } catch (error) {
     return [];
   }
@@ -373,6 +379,10 @@ async function readSavedGallery() {
 
 async function addSavedGalleryItem(item) {
   await runGalleryStore('readwrite', store => store.put(item));
+}
+
+async function deleteSavedGalleryItem(id) {
+  await runGalleryStore('readwrite', store => store.delete(id));
 }
 
 function closeGalleryDetail() {
@@ -407,34 +417,34 @@ async function renderSavedGallery() {
   const items = await readSavedGallery();
   galleryEmpty.hidden = items.length > 0;
   savedList.replaceChildren(...items.map(item => {
-    const button = document.createElement('button');
-    button.className = 'saved-list-item';
-    button.type = 'button';
-    button.dataset.savedId = item.id;
-    button.classList.toggle('active', item.id === activeSavedId);
+    const row = document.createElement('div');
+    row.className = 'saved-list-item';
+    row.dataset.savedId = item.id;
+    row.classList.toggle('active', item.id === activeSavedId);
 
-    const thumb = document.createElement('img');
-    thumb.src = item.afterImage;
-    thumb.alt = '';
-
-    const content = document.createElement('span');
-    const title = document.createElement('strong');
-    title.textContent = item.name;
-    const meta = document.createElement('small');
-    meta.textContent = formatSavedDate(item.savedAt);
-    const summary = document.createElement('em');
-    summary.textContent = item.description || 'No description saved.';
-    content.append(title, meta, summary);
-
-    button.append(thumb, content);
-    button.addEventListener('click', () => {
+    const nameButton = document.createElement('button');
+    nameButton.className = 'saved-name-button';
+    nameButton.type = 'button';
+    nameButton.textContent = item.name;
+    nameButton.addEventListener('click', () => {
       if (activeSavedId === item.id) {
         closeGalleryDetail();
       } else {
         openGalleryDetail(item);
       }
     });
-    return button;
+
+    const actions = document.createElement('div');
+    actions.className = 'saved-row-actions';
+    actions.append(
+      createSavedActionButton(item.favorite ? '★' : '☆', item.favorite ? 'Remove favorite' : 'Add favorite', () => toggleFavorite(item)),
+      createSavedActionButton('✎', 'Rename project', () => renameSavedProject(item)),
+      createSavedActionButton('↗', 'Share project', () => createShareLink(item)),
+      createSavedActionButton('×', 'Delete project', () => removeSavedProject(item))
+    );
+
+    row.append(nameButton, actions);
+    return row;
   }));
 
   if (activeSavedId) {
@@ -476,18 +486,67 @@ async function updateSavedGalleryItem(item) {
   await runGalleryStore('readwrite', store => store.put(item));
 }
 
+function createSavedActionButton(label, title, onClick) {
+  const button = document.createElement('button');
+  button.className = 'icon-button small saved-action-button';
+  button.type = 'button';
+  button.textContent = label;
+  button.title = title;
+  button.setAttribute('aria-label', title);
+  button.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    await onClick();
+  });
+  return button;
+}
+
+async function toggleFavorite(item) {
+  item.favorite = !item.favorite;
+  await updateSavedGalleryItem(item);
+  await renderSavedGallery();
+  if (activeSavedId === item.id) openGalleryDetail(item);
+}
+
+async function renameSavedProject(item) {
+  const nextName = window.prompt('Rename saved project', item.name);
+  if (nextName === null) return;
+  const trimmedName = nextName.trim();
+  if (!trimmedName) {
+    setStatus('Project name cannot be empty');
+    return;
+  }
+
+  item.name = trimmedName.slice(0, 120);
+  await updateSavedGalleryItem(item);
+  await renderSavedGallery();
+  if (activeSavedId === item.id) openGalleryDetail(item);
+  setStatus('Project renamed');
+}
+
+async function removeSavedProject(item) {
+  const shouldDelete = window.confirm(`Delete "${item.name}" from My Gallery?`);
+  if (!shouldDelete) return;
+
+  await deleteSavedGalleryItem(item.id);
+  if (activeSavedId === item.id) closeGalleryDetail();
+  await renderSavedGallery();
+  setStatus('Project deleted');
+}
+
 async function getActiveSavedItem() {
   if (!activeSavedId) return null;
   const items = await readSavedGallery();
   return items.find(item => item.id === activeSavedId) || null;
 }
 
-async function createShareLink() {
-  const item = await getActiveSavedItem();
+async function createShareLink(sourceItem) {
+  const item = sourceItem || await getActiveSavedItem();
   if (!item || !shareSavedProject) return;
 
-  shareSavedProject.disabled = true;
-  shareSavedProject.innerHTML = '<span>↗</span> Sharing...';
+  if (!sourceItem) {
+    shareSavedProject.disabled = true;
+    shareSavedProject.innerHTML = '<span>↗</span> Sharing...';
+  }
 
   try {
     const response = await fetch('/api/share', {
@@ -514,8 +573,10 @@ async function createShareLink() {
   } catch (error) {
     setStatus(error.message || 'Unable to create share link.');
   } finally {
-    shareSavedProject.disabled = false;
-    shareSavedProject.innerHTML = '<span>↗</span> Share';
+    if (!sourceItem) {
+      shareSavedProject.disabled = false;
+      shareSavedProject.innerHTML = '<span>↗</span> Share';
+    }
   }
 }
 
@@ -634,7 +695,7 @@ helpQuestions.forEach(button => {
 });
 
 closeSavedDetail.addEventListener('click', closeGalleryDetail);
-shareSavedProject.addEventListener('click', createShareLink);
+shareSavedProject.addEventListener('click', () => createShareLink());
 copyShareLink.addEventListener('click', copyCurrentShareLink);
 loadSharedProjectFromUrl().then((loadedShare) => {
   if (!loadedShare) {

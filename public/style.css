@@ -567,21 +567,30 @@ body.light .theme-toggle { box-shadow: 0 6px 20px #29224a15; }
 .saved-gallery {
   display: grid;
   align-items: start;
-  gap: 18px;
-  grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+  gap: 22px;
+  grid-template-columns: minmax(430px, 1.25fr) minmax(360px, 0.95fr);
 }
 
 .saved-list-wrap,
 .saved-detail {
-  min-height: 260px;
   padding: 18px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
 }
 
+.saved-list-wrap {
+  min-height: 0;
+  padding: 14px;
+}
+
+.saved-detail {
+  min-height: 360px;
+}
+
 .gallery-empty {
   margin: 0;
+  padding: 8px 4px;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
@@ -589,16 +598,17 @@ body.light .theme-toggle { box-shadow: 0 6px 20px #29224a15; }
 
 .saved-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .saved-list-item {
-  display: grid;
+  display: flex;
   width: 100%;
-  min-height: 96px;
-  grid-template-columns: 82px minmax(0, 1fr);
-  gap: 12px;
-  padding: 10px;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 8px 7px 14px;
   color: var(--text);
   background: var(--input);
   border: 1px solid var(--line);
@@ -617,42 +627,38 @@ body.light .theme-toggle { box-shadow: 0 6px 20px #29224a15; }
   transform: translateY(-1px);
 }
 
-.saved-list-item img {
-  width: 82px;
-  height: 74px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.saved-list-item span {
-  display: grid;
+.saved-name-button {
   min-width: 0;
-  gap: 4px;
-  align-content: center;
-}
-
-.saved-list-item strong,
-.saved-list-item small,
-.saved-list-item em {
+  flex: 1;
   overflow: hidden;
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.saved-list-item strong {
-  font-size: 15px;
+.saved-row-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 7px;
 }
 
-.saved-list-item small {
-  color: var(--accent-2);
-  font-size: 11px;
-  font-weight: 700;
+.saved-action-button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
-.saved-list-item em {
-  color: var(--muted);
-  font-size: 12px;
-  font-style: normal;
+.saved-action-button:hover {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 .saved-detail {
