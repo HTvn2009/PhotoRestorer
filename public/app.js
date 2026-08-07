@@ -22,6 +22,7 @@ if (typeof document === 'undefined') {
   const progressSteps = Array.from(document.querySelectorAll('#progressSteps li'));
   const status = document.getElementById('status');
   const description = document.getElementById('description');
+  const formattedDescription = document.getElementById('formattedDescription');
   const imageName = document.getElementById('imageName');
   const imageContext = document.getElementById('imageContext');
   const descriptionReload = document.getElementById('descriptionReload');
@@ -283,6 +284,55 @@ function renderAnalysis(analysis) {
     ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
     : 'This description does not assert origin, date, or related stories without supporting evidence.';
   analysisCard.hidden = false;
+  // Build and display a formatted HTML fragment using Times New Roman per user's request
+  try {
+    if (formattedDescription) {
+      formattedDescription.innerHTML = buildFormattedDescription(analysis);
+      formattedDescription.hidden = false;
+    }
+  } catch (e) {
+    // Fail silently if formatting cannot be produced
+    console.error('Formatted description error:', e);
+  }
+}
+
+function escapeHtml(input) {
+  if (input == null) return '';
+  return String(input)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildFormattedDescription(analysis) {
+  const titleText = (analysis?.identification?.candidate) || imageName?.value?.trim() || 'Image description';
+  const lines = [];
+
+  // Primary summary line
+  if (analysis?.description) lines.push(analysis.description);
+
+  // Observed details each as its own line
+  if (Array.isArray(analysis?.observedDetails) && analysis.observedDetails.length) {
+    for (const detail of analysis.observedDetails) lines.push(detail);
+  }
+
+  // Identification reason
+  if (analysis?.identification?.reason) lines.push(`Identification: ${analysis.identification.reason}`);
+
+  // Warnings
+  if (Array.isArray(analysis?.warnings) && analysis.warnings.length) {
+    for (const w of analysis.warnings) lines.push(`Warning: ${w}`);
+  }
+
+  // Human check suggestion
+  if (analysis?.humanCheck) lines.push('Human verification recommended.');
+
+  // Build HTML fragment with inline Times New Roman styles
+  const bodyLines = (lines.length ? lines : ['No visual description available']).map(l => `<div>- ${escapeHtml(l)}</div>`).join('\n  ');
+
+  return `<div class="title" style="font-family: 'Times New Roman', serif; font-size: 15pt; font-weight: 700;">${escapeHtml(titleText)}</div>\n<div class="body" style="font-family: 'Times New Roman', serif; font-size: 11pt;">\n  ${bodyLines}\n</div>`;
 }
 
 async function describeImage() {
