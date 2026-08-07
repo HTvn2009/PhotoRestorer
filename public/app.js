@@ -42,16 +42,30 @@ if (typeof document === 'undefined') {
   const historicalContextWrap = document.getElementById('historicalContextWrap');
   const historicalContext = document.getElementById('historicalContext');
   const sourceNote = document.getElementById('sourceNote');
+  const savedList = document.getElementById('savedList');
+  const galleryEmpty = document.getElementById('galleryEmpty');
+  const savedDetail = document.getElementById('savedDetail');
+  const savedDetailName = document.getElementById('savedDetailName');
+  const savedDetailDate = document.getElementById('savedDetailDate');
+  const savedBeforeImage = document.getElementById('savedBeforeImage');
+  const savedAfterImage = document.getElementById('savedAfterImage');
+  const savedDetailDescription = document.getElementById('savedDetailDescription');
+  const closeSavedDetail = document.getElementById('closeSavedDetail');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
 
   let selectedFile = null;
+  let selectedOriginalDataUrl = null;
   let restoredUrl = null;
+  let restoredDataUrl = null;
+  let activeSavedId = null;
   let isProcessing = false;
   let isDescribing = false;
   let restoreProgressTimer = null;
   let restoreProgressIndex = 0;
+  const galleryDbName = 'picresGallery';
+  const galleryStoreName = 'savedImages';
 
   const restoreSteps = [
     { percent: 8, title: 'Preparing image' },
@@ -138,6 +152,7 @@ function clearResult() {
   stopOutputProgress();
   if (restoredUrl) URL.revokeObjectURL(restoredUrl);
   restoredUrl = null;
+  restoredDataUrl = null;
   if (restoredImage) restoredImage.removeAttribute('src');
   if (outputResult) outputResult.hidden = true;
   if (outputPlaceholder) outputPlaceholder.hidden = false;
@@ -157,8 +172,14 @@ function showImage(file) {
   }
 
   selectedFile = file;
+  selectedOriginalDataUrl = null;
   clearResult();
   const imageUrl = URL.createObjectURL(file);
+  fileToDataUrl(file).then((dataUrl) => {
+    if (selectedFile === file) selectedOriginalDataUrl = dataUrl;
+  }).catch(() => {
+    if (selectedFile === file) selectedOriginalDataUrl = null;
+  });
 
   previewImage.onload = () => {
     imageFileName.textContent = file.name;
@@ -200,7 +221,9 @@ async function restoreImage() {
     if (!response.ok) throw new Error(result.error || 'Unable to restore the image.');
 
     const imageBytes = Uint8Array.from(atob(result.imageBase64), char => char.charCodeAt(0));
-    restoredUrl = URL.createObjectURL(new Blob([imageBytes], { type: result.mimeType || 'image/png' }));
+    const restoredMimeType = result.mimeType || 'image/png';
+    restoredDataUrl = `data:${restoredMimeType};base64,${result.imageBase64}`;
+    restoredUrl = URL.createObjectURL(new Blob([imageBytes], { type: restoredMimeType }));
     restoredImage.src = restoredUrl;
     completeOutputProgress();
     outputPlaceholder.hidden = true;
@@ -208,9 +231,9 @@ async function restoreImage() {
     outputText.textContent = 'Restored and colorized image ready';
     outputResult.hidden = false;
     retryButton.disabled = false;
-    saveButton.disabled = false;
     setStatus('Restoration complete');
     await describeImage();
+    saveButton.disabled = false;
   } catch (error) {
     stopOutputProgress();
     setStatus(error.message || 'Restore failed');
@@ -289,15 +312,155 @@ function fileToDataUrl(file) {
   });
 }
 
-function downloadResult() {
-  if (!restoredUrl) return;
-  const link = document.createElement('a');
-  const fallbackName = selectedFile.name.replace(/\.[^.]+$/, '');
-  link.href = restoredUrl;
-  link.download = `${imageName.value.trim() || fallbackName}-restored.png`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+function formatSavedDate(savedAt) {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(savedAt));
+  } catch (error) {
+    return '';
+  }
+}
+
+function openGalleryDatabase() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      reject(new Error('IndexedDB is unavailable in this browser.'));
+      return;
+    }
+
+    const request = window.indexedDB.open(galleryDbName, 1);
+    request.onerror = () => reject(request.error);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(galleryStoreName)) {
+        database.createObjectStore(galleryStoreName, { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+  });
+}
+
+async function runGalleryStore(mode, handler) {
+  const database = await openGalleryDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(galleryStoreName, mode);
+    const store = transaction.objectStore(galleryStoreName);
+    const request = handler(store);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    transaction.oncomplete = () => database.close();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+async function readSavedGallery() {
+  try {
+    const items = await runGalleryStore('readonly', store => store.getAll());
+    return items.sort((first, second) => new Date(second.savedAt) - new Date(first.savedAt));
+  } catch (error) {
+    return [];
+  }
+}
+
+async function addSavedGalleryItem(item) {
+  await runGalleryStore('readwrite', store => store.put(item));
+}
+
+function closeGalleryDetail() {
+  activeSavedId = null;
+  if (savedDetail) savedDetail.hidden = true;
+  if (savedList) {
+    savedList.querySelectorAll('.saved-list-item').forEach(item => item.classList.remove('active'));
+  }
+}
+
+function openGalleryDetail(item) {
+  if (!savedDetail || !item) return;
+  activeSavedId = item.id;
+  savedDetailName.textContent = item.name;
+  savedDetailDate.textContent = formatSavedDate(item.savedAt);
+  savedBeforeImage.src = item.beforeImage;
+  savedAfterImage.src = item.afterImage;
+  savedDetailDescription.textContent = item.description || 'No description saved.';
+  savedDetail.hidden = false;
+  savedList.querySelectorAll('.saved-list-item').forEach(button => {
+    button.classList.toggle('active', button.dataset.savedId === item.id);
+  });
+}
+
+async function renderSavedGallery() {
+  if (!savedList || !galleryEmpty) return;
+  const items = await readSavedGallery();
+  galleryEmpty.hidden = items.length > 0;
+  savedList.replaceChildren(...items.map(item => {
+    const button = document.createElement('button');
+    button.className = 'saved-list-item';
+    button.type = 'button';
+    button.dataset.savedId = item.id;
+    button.classList.toggle('active', item.id === activeSavedId);
+
+    const thumb = document.createElement('img');
+    thumb.src = item.afterImage;
+    thumb.alt = '';
+
+    const content = document.createElement('span');
+    const title = document.createElement('strong');
+    title.textContent = item.name;
+    const meta = document.createElement('small');
+    meta.textContent = formatSavedDate(item.savedAt);
+    const summary = document.createElement('em');
+    summary.textContent = item.description || 'No description saved.';
+    content.append(title, meta, summary);
+
+    button.append(thumb, content);
+    button.addEventListener('click', () => {
+      if (activeSavedId === item.id) {
+        closeGalleryDetail();
+      } else {
+        openGalleryDetail(item);
+      }
+    });
+    return button;
+  }));
+
+  if (activeSavedId) {
+    const activeItem = items.find(item => item.id === activeSavedId);
+    if (activeItem) {
+      openGalleryDetail(activeItem);
+    } else {
+      closeGalleryDetail();
+    }
+  }
+}
+
+async function saveToGallery() {
+  if (!selectedFile || !restoredDataUrl) return;
+  const fallbackName = selectedFile.name.replace(/\.[^.]+$/, '') || 'Restored image';
+  const originalImage = selectedOriginalDataUrl || await fileToDataUrl(selectedFile);
+  const item = {
+    id: `saved-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: imageName.value.trim() || fallbackName,
+    description: description.value.trim(),
+    beforeImage: originalImage,
+    afterImage: restoredDataUrl,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    await addSavedGalleryItem(item);
+    activeSavedId = item.id;
+    await renderSavedGallery();
+    activateTab('gallery');
+    openGalleryDetail(item);
+    setStatus('Saved to My Gallery');
+  } catch (error) {
+    setStatus('Unable to save. Browser storage may be full.');
+  }
 }
 
 function activateTab(target) {
@@ -336,7 +499,7 @@ function toggleHelpItem(button) {
 imageUpload.addEventListener('change', () => showImage(imageUpload.files[0]));
 runButton.addEventListener('click', restoreImage);
 retryButton.addEventListener('click', restoreImage);
-saveButton.addEventListener('click', downloadResult);
+saveButton.addEventListener('click', saveToGallery);
 descriptionReload.addEventListener('click', () => {
   describeImage();
 });
@@ -368,5 +531,7 @@ helpQuestions.forEach(button => {
   button.addEventListener('click', () => toggleHelpItem(button));
 });
 
+closeSavedDetail.addEventListener('click', closeGalleryDetail);
+renderSavedGallery();
   activateTab('mainMenu');
 }

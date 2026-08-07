@@ -184,19 +184,34 @@
           <h1>My Gallery</h1>
         </div>
       </div>
-      <div class="gallery-grid">
-        <article class="gallery-card">
-          <h3>Portrait 01</h3>
-          <p>Sharpness and color were improved while preserving the face structure.</p>
-        </article>
-        <article class="gallery-card">
-          <h3>Archive 02</h3>
-          <p>Historical detail was kept stable and the background was cleaned quietly.</p>
-        </article>
-        <article class="gallery-card">
-          <h3>Family Photo</h3>
-          <p>Retouched tone balance to support clean display and long-term archival use.</p>
-        </article>
+      <div class="saved-gallery" id="savedGallery">
+        <div class="saved-list-wrap">
+          <p class="gallery-empty" id="galleryEmpty">No saved images yet.</p>
+          <div class="saved-list" id="savedList" aria-label="Saved restored images"></div>
+        </div>
+        <aside class="saved-detail" id="savedDetail" hidden aria-live="polite">
+          <div class="saved-detail-header">
+            <div>
+              <span class="saved-date" id="savedDetailDate"></span>
+              <h2 id="savedDetailName"></h2>
+            </div>
+            <button class="icon-button small" id="closeSavedDetail" type="button" aria-label="Close saved item">x</button>
+          </div>
+          <div class="saved-compare">
+            <figure>
+              <img id="savedBeforeImage" alt="Before restoration">
+              <figcaption>Before</figcaption>
+            </figure>
+            <figure>
+              <img id="savedAfterImage" alt="After restoration">
+              <figcaption>After</figcaption>
+            </figure>
+          </div>
+          <section class="saved-description">
+            <h3>Description</h3>
+            <p id="savedDetailDescription"></p>
+          </section>
+        </aside>
       </div>
     </section>
   </section>
