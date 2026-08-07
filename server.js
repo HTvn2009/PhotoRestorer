@@ -5,7 +5,9 @@ const path = require('node:path');
 const ROOT = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT || 3000);
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_SHARE_BYTES = 12 * 1024 * 1024;
 const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const shares = new Map();
 const RESTORE_PROMPT = [
   'Restore this uploaded image by following these steps in order:',
   '1. Analyze the original image and preserve its composition, subject identity, facial features, text, clothing, architecture, artifacts, and cultural or historical context.',
@@ -77,6 +79,67 @@ function readBody(request) {
   });
 }
 
+function readShareBody(request) {
+  return new Promise((resolve, reject) => {
+    let size = 0;
+    const chunks = [];
+    request.on('data', chunk => {
+      size += chunk.length;
+      if (size > MAX_SHARE_BYTES) {
+        reject(new Error('Shared project is too large. Try a smaller image.'));
+        request.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    request.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    request.on('error', reject);
+  });
+}
+
+function isImageDataUrl(value) {
+  return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value || '');
+}
+
+function createShareId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+async function shareProject(request, response, url) {
+  if (request.method === 'POST') {
+    try {
+      const payload = JSON.parse(await readShareBody(request));
+      if (!isImageDataUrl(payload.beforeImage) || !isImageDataUrl(payload.afterImage)) {
+        return sendJson(response, 400, { error: 'Shared project must include valid original and restored images.' });
+      }
+
+      const id = createShareId();
+      const item = {
+        id,
+        name: String(payload.name || 'Restored image').slice(0, 120),
+        description: String(payload.description || '').slice(0, 5000),
+        beforeImage: payload.beforeImage,
+        afterImage: payload.afterImage,
+        savedAt: payload.savedAt || new Date().toISOString(),
+        sharedAt: new Date().toISOString()
+      };
+      shares.set(id, item);
+      return sendJson(response, 200, { id, url: `/share/${id}` });
+    } catch (error) {
+      return sendJson(response, 400, { error: error.message || 'Unable to create share link.' });
+    }
+  }
+
+  if (request.method === 'GET') {
+    const id = url.searchParams.get('id') || url.pathname.split('/').pop();
+    const item = shares.get(id);
+    if (!item) return sendJson(response, 404, { error: 'Shared project was not found.' });
+    return sendJson(response, 200, { item });
+  }
+
+  return sendJson(response, 405, { error: 'Method not allowed' });
+}
+
 async function restore(request, response) {
   if (!process.env.OPENAI_API_KEY) return sendJson(response, 503, { error: 'OPENAI_API_KEY is not configured on the server. See README.md to enable AI.' });
   try {
@@ -146,8 +209,9 @@ const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   if (request.method === 'POST' && url.pathname === '/api/restore') return restore(request, response);
   if (request.method === 'POST' && url.pathname === '/api/describe') return describe(request, response);
+  if (url.pathname === '/api/share' || url.pathname.startsWith('/api/share/')) return shareProject(request, response, url);
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
-  const requested = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
+  const requested = url.pathname === '/' || url.pathname.startsWith('/share/') ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
   const allowedFiles = new Set(['index.html', 'app.js', 'style.css', 'option-a.html', 'option-b.html', 'concepts.css', 'option-c.html', 'option-d.html', 'option-e.html', 'ui-options.css']);
   if (!allowedFiles.has(requested)) { response.writeHead(404); return response.end('Not found'); }
   const filePath = path.resolve(ROOT, requested);

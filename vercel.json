@@ -6,6 +6,9 @@
     },
     "api/describe.js": {
       "maxDuration": 180
+    },
+    "api/share.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -16,6 +19,14 @@
     {
       "source": "/api/describe",
       "destination": "/api/describe.js"
+    },
+    {
+      "source": "/api/share",
+      "destination": "/api/share.js"
+    },
+    {
+      "source": "/share/:id",
+      "destination": "/index.html"
     },
     {
       "source": "/",

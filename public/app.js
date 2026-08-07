@@ -51,6 +51,10 @@ if (typeof document === 'undefined') {
   const savedAfterImage = document.getElementById('savedAfterImage');
   const savedDetailDescription = document.getElementById('savedDetailDescription');
   const closeSavedDetail = document.getElementById('closeSavedDetail');
+  const shareSavedProject = document.getElementById('shareSavedProject');
+  const shareLinkRow = document.getElementById('shareLinkRow');
+  const shareLink = document.getElementById('shareLink');
+  const copyShareLink = document.getElementById('copyShareLink');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
@@ -374,6 +378,8 @@ async function addSavedGalleryItem(item) {
 function closeGalleryDetail() {
   activeSavedId = null;
   if (savedDetail) savedDetail.hidden = true;
+  if (shareLinkRow) shareLinkRow.hidden = true;
+  if (shareLink) shareLink.value = '';
   if (savedList) {
     savedList.querySelectorAll('.saved-list-item').forEach(item => item.classList.remove('active'));
   }
@@ -382,11 +388,14 @@ function closeGalleryDetail() {
 function openGalleryDetail(item) {
   if (!savedDetail || !item) return;
   activeSavedId = item.id;
+  savedDetail.dataset.savedId = item.id;
   savedDetailName.textContent = item.name;
   savedDetailDate.textContent = formatSavedDate(item.savedAt);
   savedBeforeImage.src = item.beforeImage;
   savedAfterImage.src = item.afterImage;
   savedDetailDescription.textContent = item.description || 'No description saved.';
+  if (shareLinkRow) shareLinkRow.hidden = !item.shareUrl;
+  if (shareLink) shareLink.value = item.shareUrl || '';
   savedDetail.hidden = false;
   savedList.querySelectorAll('.saved-list-item').forEach(button => {
     button.classList.toggle('active', button.dataset.savedId === item.id);
@@ -463,6 +472,99 @@ async function saveToGallery() {
   }
 }
 
+async function updateSavedGalleryItem(item) {
+  await runGalleryStore('readwrite', store => store.put(item));
+}
+
+async function getActiveSavedItem() {
+  if (!activeSavedId) return null;
+  const items = await readSavedGallery();
+  return items.find(item => item.id === activeSavedId) || null;
+}
+
+async function createShareLink() {
+  const item = await getActiveSavedItem();
+  if (!item || !shareSavedProject) return;
+
+  shareSavedProject.disabled = true;
+  shareSavedProject.innerHTML = '<span>↗</span> Sharing...';
+
+  try {
+    const response = await fetch('/api/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: item.name,
+        description: item.description,
+        beforeImage: item.beforeImage,
+        afterImage: item.afterImage,
+        savedAt: item.savedAt
+      })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Unable to create share link.');
+
+    const absoluteUrl = new URL(result.url, window.location.origin).href;
+    item.shareUrl = absoluteUrl;
+    await updateSavedGalleryItem(item);
+    await renderSavedGallery();
+    openGalleryDetail(item);
+    await copyText(absoluteUrl);
+    setStatus('Share link copied');
+  } catch (error) {
+    setStatus(error.message || 'Unable to create share link.');
+  } finally {
+    shareSavedProject.disabled = false;
+    shareSavedProject.innerHTML = '<span>↗</span> Share';
+  }
+}
+
+async function copyText(text) {
+  if (!text) return;
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  shareLink.focus();
+  shareLink.select();
+  document.execCommand('copy');
+}
+
+async function copyCurrentShareLink() {
+  if (!shareLink?.value) return;
+  try {
+    await copyText(shareLink.value);
+    setStatus('Share link copied');
+  } catch (error) {
+    setStatus('Copy failed. Select the link and copy it manually.');
+  }
+}
+
+async function loadSharedProjectFromUrl() {
+  const match = /^\/share\/([^/]+)$/.exec(window.location.pathname);
+  if (!match) return false;
+
+  try {
+    const response = await fetch(`/api/share?id=${encodeURIComponent(match[1])}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Unable to load shared project.');
+    activeSavedId = result.item.id;
+    galleryEmpty.hidden = true;
+    savedList.replaceChildren();
+    openGalleryDetail(result.item);
+    activateTab('gallery');
+    setStatus('Viewing shared project');
+    return true;
+  } catch (error) {
+    activateTab('gallery');
+    galleryEmpty.hidden = false;
+    galleryEmpty.textContent = error.message || 'Shared project was not found.';
+    closeGalleryDetail();
+    return true;
+  }
+}
+
 function activateTab(target) {
   const currentTarget = tabPanels.find(panel => !panel.hidden)?.dataset.panel || 'mainMenu';
 
@@ -532,6 +634,12 @@ helpQuestions.forEach(button => {
 });
 
 closeSavedDetail.addEventListener('click', closeGalleryDetail);
-renderSavedGallery();
-  activateTab('mainMenu');
+shareSavedProject.addEventListener('click', createShareLink);
+copyShareLink.addEventListener('click', copyCurrentShareLink);
+loadSharedProjectFromUrl().then((loadedShare) => {
+  if (!loadedShare) {
+    renderSavedGallery();
+    activateTab('mainMenu');
+  }
+});
 }

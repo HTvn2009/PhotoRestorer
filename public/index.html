@@ -195,7 +195,14 @@
               <span class="saved-date" id="savedDetailDate"></span>
               <h2 id="savedDetailName"></h2>
             </div>
-            <button class="icon-button small" id="closeSavedDetail" type="button" aria-label="Close saved item">x</button>
+            <div class="saved-detail-actions">
+              <button class="button secondary" id="shareSavedProject" type="button"><span>↗</span> Share</button>
+              <button class="icon-button small" id="closeSavedDetail" type="button" aria-label="Close saved item">x</button>
+            </div>
+          </div>
+          <div class="share-link-row" id="shareLinkRow" hidden>
+            <input class="text-field" id="shareLink" type="text" readonly aria-label="Share link">
+            <button class="button primary" id="copyShareLink" type="button">Copy link</button>
           </div>
           <div class="saved-compare">
             <figure>
@@ -256,25 +263,25 @@
             <span class="help-icon">+</span>
           </button>
           <div class="help-details" hidden>
-            <p>Choose a JPG, PNG, or WEBP image, add context in the description, then click Run restoration. After the result appears, you can retry or save the improved picture.</p>
+            <p>PicRes restores and colorizes old or damaged photos, then creates a clear description of what appears in the image. Add an image name, upload a JPG, PNG, or WEBP file, write any context you know, then run restoration. After the result is ready, save it to My Gallery or share a saved project with a link.</p>
           </div>
         </div>
         <div class="help-item">
           <button class="help-question" type="button" aria-expanded="false">
-            <span>What content should be use</span>
+            <span>What images work best</span>
             <span class="help-icon">+</span>
           </button>
           <div class="help-details" hidden>
-            <p>Upload a real photo containing faces, architecture, cultural objects, documents, or historical scenes. Write concise information that helps preserve important context but avoid unsupported claims.</p>
+            <p>Use real photographs that show people, family memories, buildings, landmarks, cultural objects, documents, artifacts, ceremonies, or historical scenes. The image should clearly show the main subject and should not be larger than 3 MB. Avoid screenshots, cartoons, AI images, heavily edited pictures, or images where the important subject is too small or hidden.</p>
           </div>
         </div>
         <div class="help-item">
           <button class="help-question" type="button" aria-expanded="false">
-            <span>Why use this web</span>
+            <span>What to write</span>
             <span class="help-icon">+</span>
           </button>
           <div class="help-details" hidden>
-            <p>This web app is built to quickly restore damaged or low-quality photographs with a clear, respectful workflow for preserving important visual history.</p>
+            <p>Write only information you already know, such as the person, place, date, event, object name, or family story connected to the photo. If you are unsure, leave the context field blank or use cautious wording. The description should preserve useful history without inventing facts.</p>
           </div>
         </div>
       </div>
