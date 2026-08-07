@@ -15,6 +15,11 @@ if (typeof document === 'undefined') {
   const outputResult = document.getElementById('outputResult');
   const outputPlaceholder = document.getElementById('outputPlaceholder');
   const outputText = document.getElementById('outputText');
+  const outputProgress = document.getElementById('outputProgress');
+  const progressPercent = document.getElementById('progressPercent');
+  const progressTitle = document.getElementById('progressTitle');
+  const progressFill = document.getElementById('progressFill');
+  const progressSteps = Array.from(document.querySelectorAll('#progressSteps li'));
   const status = document.getElementById('status');
   const description = document.getElementById('description');
   const imageName = document.getElementById('imageName');
@@ -45,6 +50,18 @@ if (typeof document === 'undefined') {
   let restoredUrl = null;
   let isProcessing = false;
   let isDescribing = false;
+  let restoreProgressTimer = null;
+  let restoreProgressIndex = 0;
+
+  const restoreSteps = [
+    { percent: 8, title: 'Preparing image' },
+    { percent: 20, title: 'Analyzing original image' },
+    { percent: 38, title: 'Repairing visible damage' },
+    { percent: 56, title: 'Recovering detail and sharpness' },
+    { percent: 74, title: 'Colorizing naturally' },
+    { percent: 88, title: 'Balancing tone and realism' },
+    { percent: 94, title: 'Finalizing restored PNG' }
+  ];
 
 themeButton.addEventListener('click', () => {
   const isLight = document.body.classList.toggle('light');
@@ -66,7 +83,59 @@ function setStatus(message, processing = false) {
   status.classList.toggle('processing', processing);
 }
 
+function setOutputProgress(stepIndex) {
+  if (!outputProgress) return;
+  const step = restoreSteps[Math.min(stepIndex, restoreSteps.length - 1)];
+  if (progressPercent) progressPercent.textContent = `${step.percent}%`;
+  if (progressTitle) progressTitle.textContent = step.title;
+  if (progressFill) progressFill.style.width = `${step.percent}%`;
+  progressSteps.forEach((item, index) => {
+    item.classList.toggle('done', index < stepIndex - 1);
+    item.classList.toggle('active', index === Math.max(0, stepIndex - 1));
+  });
+}
+
+function startOutputProgress() {
+  window.clearInterval(restoreProgressTimer);
+  restoreProgressIndex = 0;
+  if (outputResult) outputResult.hidden = true;
+  if (outputPlaceholder) outputPlaceholder.hidden = false;
+  if (outputText) outputText.textContent = 'Following restoration steps...';
+  if (outputProgress) outputProgress.hidden = false;
+  setOutputProgress(restoreProgressIndex);
+  restoreProgressTimer = window.setInterval(() => {
+    if (restoreProgressIndex < restoreSteps.length - 1) {
+      restoreProgressIndex += 1;
+      setOutputProgress(restoreProgressIndex);
+    }
+  }, 2200);
+}
+
+function completeOutputProgress() {
+  window.clearInterval(restoreProgressTimer);
+  restoreProgressTimer = null;
+  if (progressPercent) progressPercent.textContent = '100%';
+  if (progressTitle) progressTitle.textContent = 'Restored and colorized';
+  if (progressFill) progressFill.style.width = '100%';
+  progressSteps.forEach(item => {
+    item.classList.add('done');
+    item.classList.remove('active');
+  });
+}
+
+function stopOutputProgress() {
+  window.clearInterval(restoreProgressTimer);
+  restoreProgressTimer = null;
+  if (outputProgress) outputProgress.hidden = true;
+  if (progressFill) progressFill.style.width = '0%';
+  progressSteps.forEach(item => {
+    item.classList.remove('done');
+    item.classList.remove('active');
+  });
+}
+
 function clearResult() {
+  stopOutputProgress();
   if (restoredUrl) URL.revokeObjectURL(restoredUrl);
   restoredUrl = null;
   if (restoredImage) restoredImage.removeAttribute('src');
@@ -115,6 +184,7 @@ async function restoreImage() {
   retryButton.disabled = true;
   runButton.innerHTML = '<span>✦</span> Restoring...';
   setStatus('Repairing, enhancing, and colorizing image', true);
+  startOutputProgress();
 
   try {
     const response = await fetch('/api/restore', {
@@ -132,7 +202,9 @@ async function restoreImage() {
     const imageBytes = Uint8Array.from(atob(result.imageBase64), char => char.charCodeAt(0));
     restoredUrl = URL.createObjectURL(new Blob([imageBytes], { type: result.mimeType || 'image/png' }));
     restoredImage.src = restoredUrl;
+    completeOutputProgress();
     outputPlaceholder.hidden = true;
+    if (outputProgress) outputProgress.hidden = true;
     outputText.textContent = 'Restored and colorized image ready';
     outputResult.hidden = false;
     retryButton.disabled = false;
@@ -140,6 +212,7 @@ async function restoreImage() {
     setStatus('Restoration complete');
     await describeImage();
   } catch (error) {
+    stopOutputProgress();
     setStatus(error.message || 'Restore failed');
     if (outputText) outputText.textContent = error.message || 'Unable to restore the image.';
   } finally {
