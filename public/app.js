@@ -27,22 +27,6 @@ if (typeof document === 'undefined') {
   const imageContext = document.getElementById('imageContext');
   const descriptionReload = document.getElementById('descriptionReload');
   const analysisCard = document.getElementById('analysisCard');
-  const analysisCategory = document.getElementById('analysisCategory');
-  const analysisConfidence = document.getElementById('analysisConfidence');
-  const analysisIdentification = document.getElementById('analysisIdentification');
-  const analysisDescription = document.getElementById('analysisDescription');
-  const observedDetails = document.getElementById('observedDetails');
-  const originWrap = document.getElementById('originWrap');
-  const originText = document.getElementById('originText');
-  const buildPeriodWrap = document.getElementById('buildPeriodWrap');
-  const buildPeriodText = document.getElementById('buildPeriodText');
-  const purposeWrap = document.getElementById('purposeWrap');
-  const purposeText = document.getElementById('purposeText');
-  const significanceWrap = document.getElementById('significanceWrap');
-  const significanceText = document.getElementById('significanceText');
-  const historicalContextWrap = document.getElementById('historicalContextWrap');
-  const historicalContext = document.getElementById('historicalContext');
-  const sourceNote = document.getElementById('sourceNote');
   const savedList = document.getElementById('savedList');
   const galleryEmpty = document.getElementById('galleryEmpty');
   const savedDetail = document.getElementById('savedDetail');
@@ -292,33 +276,12 @@ function buildDescriptionText(analysis) {
 }
 
 function renderAnalysis(analysis) {
-  description.value = buildDescriptionText(analysis);
-  description.readOnly = false;
-  analysisCategory.textContent = formatCategory(analysis.category);
-  analysisConfidence.textContent = `Confidence: ${{ low: 'low', medium: 'medium', high: 'high' }[analysis.identification.confidence] || 'unknown'}`;
-  analysisIdentification.textContent = analysis.identification.candidate
-    ? `${analysis.identification.candidate}. ${analysis.identification.reason}`
-    : analysis.identification.reason;
-  analysisDescription.textContent = analysis.description || 'No verified summary available.';
-  observedDetails.replaceChildren(...(analysis.observedDetails || []).map(detail => {
-    const item = document.createElement('li');
-    item.textContent = detail;
-    return item;
-  }));
-  originWrap.hidden = !analysis.origin;
-  originText.textContent = analysis.origin || '';
-  buildPeriodWrap.hidden = !analysis.buildPeriod;
-  buildPeriodText.textContent = analysis.buildPeriod || '';
-  purposeWrap.hidden = !analysis.purpose;
-  purposeText.textContent = analysis.purpose || '';
-  significanceWrap.hidden = !analysis.significance;
-  significanceText.textContent = analysis.significance || '';
-  historicalContextWrap.hidden = !analysis.historicalContext;
-  historicalContext.textContent = analysis.historicalContext || '';
-  sourceNote.textContent = analysis.sourceSearchRecommended
-    ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
-    : 'This description does not assert origin, date, or related stories without supporting evidence.';
-  analysisCard.hidden = true;
+  if (description) {
+    description.value = buildDescriptionText(analysis);
+    description.readOnly = false;
+  }
+
+  if (analysisCard) analysisCard.hidden = true;
   if (formattedDescription) formattedDescription.hidden = true;
 }
 
@@ -341,7 +304,7 @@ async function describeImage() {
   try {
     const response = await fetch('/api/describe', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: await fileToDataUrl(selectedFile), title: imageName.value.trim(), context: imageContext.value.trim() })
+      body: JSON.stringify({ image: restoredDataUrl || await fileToDataUrl(selectedFile), title: imageName.value.trim(), context: imageContext.value.trim() })
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to analyze the image.');
