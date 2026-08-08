@@ -35,6 +35,10 @@ if (typeof document === 'undefined') {
   const savedBeforeImage = document.getElementById('savedBeforeImage');
   const savedAfterImage = document.getElementById('savedAfterImage');
   const savedDetailDescription = document.getElementById('savedDetailDescription');
+  const favoriteFilter = document.getElementById('favoriteFilter');
+  const favoriteSavedProject = document.getElementById('favoriteSavedProject');
+  const renameSavedProjectButton = document.getElementById('renameSavedProject');
+  const deleteSavedProject = document.getElementById('deleteSavedProject');
   const closeSavedDetail = document.getElementById('closeSavedDetail');
   const shareSavedProject = document.getElementById('shareSavedProject');
   const shareLinkRow = document.getElementById('shareLinkRow');
@@ -49,6 +53,7 @@ if (typeof document === 'undefined') {
   let restoredUrl = null;
   let restoredDataUrl = null;
   let activeSavedId = null;
+  let showFavoritesOnly = false;
   let isProcessing = false;
   let isDescribing = false;
   let restoreProgressTimer = null;
@@ -414,6 +419,12 @@ function openGalleryDetail(item) {
   savedBeforeImage.src = item.beforeImage;
   savedAfterImage.src = item.afterImage;
   savedDetailDescription.textContent = item.description || 'No description saved.';
+  if (favoriteSavedProject) {
+    favoriteSavedProject.textContent = item.favorite ? '★' : '☆';
+    favoriteSavedProject.title = item.favorite ? 'Remove favorite' : 'Add favorite';
+    favoriteSavedProject.setAttribute('aria-label', favoriteSavedProject.title);
+    favoriteSavedProject.classList.toggle('active', Boolean(item.favorite));
+  }
   if (shareLinkRow) shareLinkRow.hidden = !item.shareUrl;
   if (shareLink) shareLink.value = item.shareUrl || '';
   savedDetail.hidden = false;
@@ -425,8 +436,12 @@ function openGalleryDetail(item) {
 async function renderSavedGallery() {
   if (!savedList || !galleryEmpty) return;
   const items = await readSavedGallery();
-  galleryEmpty.hidden = items.length > 0;
-  savedList.replaceChildren(...items.map(item => {
+  const visibleItems = showFavoritesOnly ? items.filter(item => item.favorite) : items;
+  galleryEmpty.hidden = visibleItems.length > 0;
+  galleryEmpty.textContent = showFavoritesOnly && items.length
+    ? 'No favorite projects yet.'
+    : 'No saved images yet.';
+  savedList.replaceChildren(...visibleItems.map(item => {
     const row = document.createElement('div');
     row.className = 'saved-list-item';
     row.dataset.savedId = item.id;
@@ -458,7 +473,7 @@ async function renderSavedGallery() {
   }));
 
   if (activeSavedId) {
-    const activeItem = items.find(item => item.id === activeSavedId);
+    const activeItem = visibleItems.find(item => item.id === activeSavedId);
     if (activeItem) {
       openGalleryDetail(activeItem);
     } else {
@@ -514,7 +529,7 @@ async function toggleFavorite(item) {
   item.favorite = !item.favorite;
   await updateSavedGalleryItem(item);
   await renderSavedGallery();
-  if (activeSavedId === item.id) openGalleryDetail(item);
+  if (activeSavedId === item.id && (!showFavoritesOnly || item.favorite)) openGalleryDetail(item);
 }
 
 async function renameSavedProject(item) {
@@ -588,6 +603,16 @@ async function createShareLink(sourceItem) {
       shareSavedProject.innerHTML = '<span>↗</span> Share';
     }
   }
+}
+
+async function runActiveSavedAction(action) {
+  const item = await getActiveSavedItem();
+  if (!item) {
+    setStatus('Choose a saved project first');
+    return;
+  }
+
+  await action(item);
 }
 
 async function copyText(text) {
@@ -705,8 +730,15 @@ helpQuestions.forEach(button => {
 });
 
 closeSavedDetail.addEventListener('click', closeGalleryDetail);
+favoriteSavedProject.addEventListener('click', () => runActiveSavedAction(toggleFavorite));
+renameSavedProjectButton.addEventListener('click', () => runActiveSavedAction(renameSavedProject));
 shareSavedProject.addEventListener('click', () => createShareLink());
+deleteSavedProject.addEventListener('click', () => runActiveSavedAction(removeSavedProject));
 copyShareLink.addEventListener('click', copyCurrentShareLink);
+favoriteFilter.addEventListener('change', () => {
+  showFavoritesOnly = favoriteFilter.checked;
+  renderSavedGallery();
+});
 loadSharedProjectFromUrl().then((loadedShare) => {
   if (!loadedShare) {
     renderSavedGallery();
