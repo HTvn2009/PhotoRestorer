@@ -143,7 +143,7 @@ function stopOutputProgress() {
   });
 }
 
-function clearResult() {
+function clearResult({ clearDescription = true } = {}) {
   stopOutputProgress();
   if (restoredUrl) URL.revokeObjectURL(restoredUrl);
   restoredUrl = null;
@@ -154,8 +154,8 @@ function clearResult() {
   if (outputText) outputText.textContent = 'will appear here after processing';
   retryButton.disabled = true;
   saveButton.disabled = true;
-  if (description) description.value = '';
-  if (description) description.readOnly = true;
+  if (clearDescription && description) description.value = '';
+  if (clearDescription && description) description.readOnly = true;
   if (analysisCard) analysisCard.hidden = true;
 }
 
@@ -196,7 +196,7 @@ async function restoreImage() {
   }
 
   isProcessing = true;
-  clearResult();
+  clearResult({ clearDescription: false });
   runButton.disabled = true;
   retryButton.disabled = true;
   runButton.innerHTML = '<span>✦</span> Restoring...';
@@ -228,7 +228,6 @@ async function restoreImage() {
     outputResult.hidden = false;
     retryButton.disabled = false;
     setStatus('Restoration complete');
-    await describeImage();
     saveButton.disabled = false;
   } catch (error) {
     stopOutputProgress();
