@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const ROOT = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT || 3000);
-const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_SHARE_BYTES = 12 * 1024 * 1024;
 const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const shares = new Map();
@@ -88,7 +88,7 @@ function readBody(request) {
     request.on('data', chunk => {
       size += chunk.length;
       if (size > Math.ceil(MAX_IMAGE_BYTES * 1.4)) {
-        reject(new Error('Image is too large. The limit is 3 MB.'));
+        reject(new Error('Image is too large. The limit is 10 MB.'));
         request.destroy();
         return;
       }
@@ -167,7 +167,7 @@ async function restore(request, response) {
     const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(payload.image || '');
     if (!match) return sendJson(response, 400, { error: 'Only valid JPG, PNG, or WEBP images are accepted.' });
     const bytes = Buffer.from(match[2], 'base64');
-    if (bytes.length > MAX_IMAGE_BYTES) return sendJson(response, 413, { error: 'Image exceeds the 3 MB limit.' });
+    if (bytes.length > MAX_IMAGE_BYTES) return sendJson(response, 413, { error: 'Image exceeds the 10 MB limit.' });
     const extension = match[1] === 'image/jpeg' ? 'jpg' : match[1].split('/')[1];
     const image = new Blob([bytes], { type: match[1] });
     const form = new FormData();
@@ -195,7 +195,7 @@ async function describe(request, response) {
     const payload = JSON.parse(await readBody(request));
     const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(payload.image || '');
     if (!match) return sendJson(response, 400, { error: 'Only valid JPG, PNG, or WEBP images are accepted.' });
-    if (Buffer.from(match[2], 'base64').length > MAX_IMAGE_BYTES) return sendJson(response, 413, { error: 'Image exceeds the 3 MB limit.' });
+    if (Buffer.from(match[2], 'base64').length > MAX_IMAGE_BYTES) return sendJson(response, 413, { error: 'Image exceeds the 10 MB limit.' });
     const title = String(payload.title || '').slice(0, 120);
     const userContext = String(payload.context || '').slice(0, 600);
     const aiResponse = await fetch('https://api.openai.com/v1/responses', {

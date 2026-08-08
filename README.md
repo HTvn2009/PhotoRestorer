@@ -15,7 +15,7 @@ $env:OPENAI_API_KEY = "your_api_key_here"
 npm start
 ```
 
-Open `http://localhost:3000`. JPG, PNG, and WEBP images are currently limited to 3 MB.
+Open `http://localhost:3000`. JPG, PNG, and WEBP images are currently limited to 10 MB.
 
 ## API
 

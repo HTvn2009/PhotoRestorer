@@ -1,4 +1,4 @@
-const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const descriptionSchema = {
   type: 'object',
@@ -73,7 +73,7 @@ module.exports = async function handler(req, res) {
   const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(payload.image || '');
   if (!match) return sendJson(res, 400, { error: 'Invalid image payload' });
   if (Buffer.from(match[2], 'base64').length > MAX_IMAGE_BYTES) {
-    return sendJson(res, 413, { error: 'Image exceeds the 3 MB limit' });
+    return sendJson(res, 413, { error: 'Image exceeds the 10 MB limit' });
   }
 
   const title = String(payload.title || '').slice(0, 120);

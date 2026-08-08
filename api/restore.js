@@ -1,4 +1,4 @@
-const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const RESTORE_PROMPT = [
   'Restore this uploaded image by following these steps in order:',
   '1. Analyze the original image and preserve its composition, subject identity, facial features, text, clothing, architecture, artifacts, and cultural or historical context.',
@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
   if (bytes.length > MAX_IMAGE_BYTES) {
     res.statusCode = 413;
     res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'Image exceeds the 3 MB Vercel limit' }));
+    return res.end(JSON.stringify({ error: 'Image exceeds the 10 MB limit' }));
   }
 
   const extension = match[1] === 'image/jpeg' ? 'jpg' : match[1].split('/')[1];

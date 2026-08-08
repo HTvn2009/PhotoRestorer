@@ -156,8 +156,8 @@ function clearResult() {
 function showImage(file) {
   if (!file || !file.type.startsWith('image/')) return;
 
-  if (file.size > 3 * 1024 * 1024) {
-    setStatus('Please choose a file smaller than 3 MB');
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus('Please choose a file smaller than 10 MB');
     return;
   }
 
@@ -304,7 +304,7 @@ async function describeImage() {
   try {
     const response = await fetch('/api/describe', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: restoredDataUrl || await fileToDataUrl(selectedFile), title: imageName.value.trim(), context: imageContext.value.trim() })
+      body: JSON.stringify({ image: await fileToDataUrl(selectedFile), title: imageName.value.trim(), context: imageContext.value.trim() })
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to analyze the image.');
