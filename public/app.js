@@ -256,8 +256,43 @@ function formatCategory(category) {
   return ({ historical: 'Historical image', cultural: 'Cultural content', artifact: 'Artifact / object', landmark: 'Landmark / architecture', people: 'People in image', general: 'General image' })[category] || 'Image content';
 }
 
+function pushDescriptionLine(lines, label, value) {
+  if (!value) return;
+  lines.push(`${label}: ${value}`);
+}
+
+function buildDescriptionText(analysis) {
+  const lines = [];
+  const titleText = (analysis?.identification?.candidate) || imageName?.value?.trim();
+
+  pushDescriptionLine(lines, 'Subject', titleText);
+  pushDescriptionLine(lines, 'Description', analysis?.description);
+  pushDescriptionLine(lines, 'Origin', analysis?.origin);
+  pushDescriptionLine(lines, 'Build time / period', analysis?.buildPeriod);
+  pushDescriptionLine(lines, 'Purpose', analysis?.purpose);
+  pushDescriptionLine(lines, 'Significance', analysis?.significance);
+  pushDescriptionLine(lines, 'Historical / cultural context', analysis?.historicalContext);
+
+  if (Array.isArray(analysis?.observedDetails) && analysis.observedDetails.length) {
+    lines.push('Observed details:');
+    analysis.observedDetails.forEach(detail => lines.push(`- ${detail}`));
+  }
+
+  if (analysis?.identification?.reason) {
+    pushDescriptionLine(lines, 'Identification note', analysis.identification.reason);
+  }
+
+  if (Array.isArray(analysis?.warnings) && analysis.warnings.length) {
+    lines.push('Warnings:');
+    analysis.warnings.forEach(warning => lines.push(`- ${warning}`));
+  }
+
+  lines.push(analysis?.humanCheck ? 'Human verification recommended.' : 'No extra human verification warning from the AI analysis.');
+  return lines.join('\n');
+}
+
 function renderAnalysis(analysis) {
-  description.value = analysis.description || '';
+  description.value = buildDescriptionText(analysis);
   description.readOnly = false;
   analysisCategory.textContent = formatCategory(analysis.category);
   analysisConfidence.textContent = `Confidence: ${{ low: 'low', medium: 'medium', high: 'high' }[analysis.identification.confidence] || 'unknown'}`;
@@ -284,16 +319,7 @@ function renderAnalysis(analysis) {
     ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
     : 'This description does not assert origin, date, or related stories without supporting evidence.';
   analysisCard.hidden = false;
-  // Build and display a formatted HTML fragment using Times New Roman per user's request
-  try {
-    if (formattedDescription) {
-      formattedDescription.innerHTML = buildFormattedDescription(analysis);
-      formattedDescription.hidden = false;
-    }
-  } catch (e) {
-    // Fail silently if formatting cannot be produced
-    console.error('Formatted description error:', e);
-  }
+  if (formattedDescription) formattedDescription.hidden = true;
 }
 
 function escapeHtml(input) {
@@ -304,35 +330,6 @@ function escapeHtml(input) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function buildFormattedDescription(analysis) {
-  const titleText = (analysis?.identification?.candidate) || imageName?.value?.trim() || 'Image description';
-  const lines = [];
-
-  // Primary summary line
-  if (analysis?.description) lines.push(analysis.description);
-
-  // Observed details each as its own line
-  if (Array.isArray(analysis?.observedDetails) && analysis.observedDetails.length) {
-    for (const detail of analysis.observedDetails) lines.push(detail);
-  }
-
-  // Identification reason
-  if (analysis?.identification?.reason) lines.push(`Identification: ${analysis.identification.reason}`);
-
-  // Warnings
-  if (Array.isArray(analysis?.warnings) && analysis.warnings.length) {
-    for (const w of analysis.warnings) lines.push(`Warning: ${w}`);
-  }
-
-  // Human check suggestion
-  if (analysis?.humanCheck) lines.push('Human verification recommended.');
-
-  // Build HTML fragment with inline Times New Roman styles
-  const bodyLines = (lines.length ? lines : ['No visual description available']).map(l => `<div>- ${escapeHtml(l)}</div>`).join('\n  ');
-
-  return `<div class="title" style="font-family: 'Times New Roman', serif; font-size: 15pt; font-weight: 700;">${escapeHtml(titleText)}</div>\n<div class="body" style="font-family: 'Times New Roman', serif; font-size: 11pt;">\n  ${bodyLines}\n</div>`;
 }
 
 async function describeImage() {

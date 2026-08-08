@@ -413,7 +413,21 @@ textarea::placeholder { color: #737584; }
 .label-row { display: flex; justify-content: space-between; }
 .label-row span { color: var(--muted); font-size: 11px; }
 
-textarea { display: block; min-height: 135px; padding: 15px; line-height: 1.5; resize: vertical; }
+textarea {
+  display: block;
+  min-height: 135px;
+  padding: 15px;
+  overflow: auto;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+#description {
+  min-height: 260px;
+  max-height: 420px;
+}
 .description-actions { margin-bottom: 0; }
 
 .analysis-card { display: grid; gap: 15px; margin-top: 14px; padding: 17px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }

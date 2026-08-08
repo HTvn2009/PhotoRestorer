@@ -81,15 +81,16 @@ module.exports = async function handler(req, res) {
   const instructions = [
     'You analyze photographs for a cultural and historical photo-restoration product.',
     'Respond in English using the supplied JSON schema.',
-    'First classify the image. Describe only visual evidence visible in the original image.',
-    'For well-known landmarks such as Mount Rushmore, prioritize a concise encyclopedia-style narrative: what the subject is, why it matters, its construction or carving story, and its historical significance. Use the description field as the main story summary, not a list of low-level image details.',
-    'Keep observedDetails extremely short and selective: only 3 to 5 of the strongest visible cues that directly support the landmark or object identification. Do not produce long inventories of surface details, colors, textures, dimensions, or technical restoration traits.',
-    'Populate origin, buildPeriod, purpose, significance, and historicalContext with concise, evidence-based prose only when there is direct support from the image or clearly stated user context. If the image only allows a cautious visual recognition, keep those fields empty and mark the uncertainty clearly through confidence and humanCheck.',
-    'For landmark or architectural subjects, prefer broad interpretive context such as construction intent, cultural significance, and story of the place or object over exhaustive visual enumeration.',
-    'Do not include technical details such as color palette, brightness, contrast, image size, pixel dimensions, cropping, sharpening, or restoration quality unless they are directly relevant to interpretation.',
+    'Write for a normal viewer: natural, clear, and easy to observe. Avoid stiff labels inside prose, technical restoration language, or long inventories.',
+    'First classify the image, then describe only visual evidence visible in the original image plus any user-provided context.',
+    'The description field is the main text that will be placed inside a description box. Keep it self-contained, polished, and readable as one natural paragraph of 70 to 120 words.',
+    'Do not put Markdown, HTML, bullet symbols, numbering, table syntax, code fences, or section headings inside the description field.',
+    'For well-known landmarks, artifacts, or cultural subjects, make the description a concise encyclopedia-style narrative: what the subject appears to be, why it matters, its visible character, and cautious historical significance.',
+    'Keep observedDetails short and selective: 3 to 5 simple visible cues that directly support the description. Each cue must be easy for a viewer to check in the image.',
+    'Populate origin, buildPeriod, purpose, significance, and historicalContext with concise, evidence-based prose only when the image or user context supports it. Use an empty string when unsupported.',
     'Do not identify a person, origin, date, location, event, artifact, landmark, or cultural tradition as fact unless it is directly supported by visible evidence or user-provided context.',
     'For uncertain identification, use cautious wording, set low or medium confidence, add a warning, and set humanCheck to true.',
-    'For non-famous people, never infer identity, private information, or sensitive traits. For general images, keep the description short.',
+    'For non-famous people, never infer identity, private information, or sensitive traits.',
     'Do not invent sources, citations, stories, text, symbols, or historical claims. sourceSearchRecommended may be true for a plausible historical, cultural, artifact, or landmark candidate, but no source is verified in this response.'
   ].join(' ');
 
