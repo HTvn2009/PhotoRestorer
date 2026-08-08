@@ -318,7 +318,7 @@ function renderAnalysis(analysis) {
   sourceNote.textContent = analysis.sourceSearchRecommended
     ? 'Search museum, archive, or academic sources to verify this possible identification. No sources have been verified yet.'
     : 'This description does not assert origin, date, or related stories without supporting evidence.';
-  analysisCard.hidden = false;
+  analysisCard.hidden = true;
   if (formattedDescription) formattedDescription.hidden = true;
 }
 
