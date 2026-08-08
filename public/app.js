@@ -30,6 +30,7 @@ if (typeof document === 'undefined') {
   const savedList = document.getElementById('savedList');
   const galleryEmpty = document.getElementById('galleryEmpty');
   const savedDetail = document.getElementById('savedDetail');
+  const savedDetailEmpty = document.getElementById('savedDetailEmpty');
   const savedDetailName = document.getElementById('savedDetailName');
   const savedDetailDate = document.getElementById('savedDetailDate');
   const savedBeforeImage = document.getElementById('savedBeforeImage');
@@ -403,6 +404,7 @@ async function deleteSavedGalleryItem(id) {
 function closeGalleryDetail() {
   activeSavedId = null;
   if (savedDetail) savedDetail.hidden = true;
+  if (savedDetailEmpty) savedDetailEmpty.hidden = false;
   if (shareLinkRow) shareLinkRow.hidden = true;
   if (shareLink) shareLink.value = '';
   if (savedList) {
@@ -427,6 +429,7 @@ function openGalleryDetail(item) {
   }
   if (shareLinkRow) shareLinkRow.hidden = !item.shareUrl;
   if (shareLink) shareLink.value = item.shareUrl || '';
+  if (savedDetailEmpty) savedDetailEmpty.hidden = true;
   savedDetail.hidden = false;
   savedList.querySelectorAll('.saved-list-item').forEach(button => {
     button.classList.toggle('active', button.dataset.savedId === item.id);
