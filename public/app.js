@@ -50,6 +50,11 @@ if (typeof document === 'undefined') {
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+  const chatNote = document.getElementById('chatNote');
+  const chatSuggestionButtons = Array.from(document.querySelectorAll('#chatSuggestions button'));
 
   let selectedFile = null;
   let selectedOriginalDataUrl = null;
@@ -59,6 +64,7 @@ if (typeof document === 'undefined') {
   let showFavoritesOnly = false;
   let isProcessing = false;
   let isDescribing = false;
+  let isStudying = false;
   let restoreProgressTimer = null;
   let restoreProgressIndex = 0;
   const galleryDbName = 'picresGallery';
@@ -210,6 +216,8 @@ function showImage(file) {
   selectedFile = file;
   selectedOriginalDataUrl = null;
   clearResult();
+  resetStudyChat();
+  updateStudyChatState();
   const imageUrl = URL.createObjectURL(file);
   fileToDataUrl(file).then((dataUrl) => {
     if (selectedFile === file) selectedOriginalDataUrl = dataUrl;
@@ -227,6 +235,109 @@ function showImage(file) {
   };
 
   previewImage.src = imageUrl;
+}
+
+function setStudyWelcome() {
+  if (!chatMessages) return;
+  chatMessages.replaceChildren();
+  const orb = document.createElement('div');
+  orb.className = 'chat-orb';
+  orb.textContent = 'i';
+  const title = document.createElement('h2');
+  title.textContent = 'Learning notes';
+  const text = document.createElement('p');
+  text.textContent = selectedFile
+    ? 'Ask about visible details, possible cultural context, or what should be verified.'
+    : 'Upload an image, then ask about visible details, possible cultural context, or what should be verified.';
+  chatMessages.append(orb, title, text);
+}
+
+function resetStudyChat() {
+  setStudyWelcome();
+  if (chatInput) chatInput.value = '';
+}
+
+function updateStudyChatState() {
+  const canAsk = Boolean(selectedFile) && !isStudying;
+  if (chatInput) chatInput.disabled = !canAsk;
+  if (chatSend) chatSend.disabled = !canAsk;
+  chatSuggestionButtons.forEach(button => {
+    button.disabled = !canAsk;
+  });
+  if (chatNote) {
+    chatNote.textContent = selectedFile
+      ? isStudying ? 'Studying the uploaded image...' : 'Ask a question about the uploaded image.'
+      : 'Upload an image to start asking.';
+  }
+}
+
+function appendChatMessage(role, text, variant = '') {
+  if (!chatMessages) return null;
+  const message = document.createElement('div');
+  message.className = `chat-message ${role}${variant ? ` ${variant}` : ''}`;
+  const label = document.createElement('strong');
+  label.textContent = role === 'user' ? 'You' : 'Study Assistant';
+  const body = document.createElement('p');
+  body.textContent = text;
+  message.append(label, body);
+  chatMessages.append(message);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return message;
+}
+
+function updateStudySuggestions(suggestedQuestions) {
+  if (!Array.isArray(suggestedQuestions) || !suggestedQuestions.length) return;
+  chatSuggestionButtons.forEach((button, index) => {
+    if (!suggestedQuestions[index]) return;
+    button.textContent = suggestedQuestions[index];
+    button.dataset.question = suggestedQuestions[index];
+  });
+}
+
+async function askStudyAssistant(questionText) {
+  const question = String(questionText || chatInput?.value || '').trim();
+  if (!question || !selectedFile || isStudying) {
+    if (!selectedFile) setStatus('Upload an image before asking the assistant');
+    return;
+  }
+
+  isStudying = true;
+  updateStudyChatState();
+  if (chatInput) chatInput.value = '';
+  appendChatMessage('user', question);
+  const loadingMessage = appendChatMessage('assistant', 'Studying the uploaded image...', 'loading');
+
+  try {
+    const response = await fetch('/api/study', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: selectedOriginalDataUrl || await fileToDataUrl(selectedFile),
+        question,
+        title: imageName.value.trim(),
+        context: imageContext.value.trim()
+      })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Unable to answer the question.');
+    if (loadingMessage) loadingMessage.remove();
+    appendChatMessage('assistant', result.answer || 'I could not find enough visual evidence to answer that.');
+    updateStudySuggestions(result.suggestedQuestions);
+    setStatus('Study answer ready');
+  } catch (error) {
+    if (loadingMessage) {
+      loadingMessage.className = 'chat-message assistant error';
+      const body = loadingMessage.querySelector('p');
+      if (body) body.textContent = error.message || 'Unable to answer the question.';
+    } else {
+      appendChatMessage('assistant', error.message || 'Unable to answer the question.', 'error');
+    }
+    setStatus('Study assistant could not answer');
+  } finally {
+    isStudying = false;
+    updateStudyChatState();
+    if (chatInput && selectedFile) chatInput.focus();
+  }
 }
 
 async function restoreImage() {
@@ -836,6 +947,25 @@ tabButtons.forEach(button => {
 helpQuestions.forEach(button => {
   button.addEventListener('click', () => toggleHelpItem(button));
 });
+
+if (chatSend) {
+  chatSend.addEventListener('click', () => askStudyAssistant());
+}
+
+if (chatInput) {
+  chatInput.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    askStudyAssistant();
+  });
+}
+
+chatSuggestionButtons.forEach(button => {
+  button.addEventListener('click', () => askStudyAssistant(button.dataset.question || button.textContent));
+});
+
+setStudyWelcome();
+updateStudyChatState();
 
 closeSavedDetail.addEventListener('click', closeGalleryDetail);
 favoriteSavedProject.addEventListener('click', () => runActiveSavedAction(toggleFavorite));

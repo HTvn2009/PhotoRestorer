@@ -7,6 +7,9 @@
     "api/describe.js": {
       "maxDuration": 180
     },
+    "api/study.js": {
+      "maxDuration": 180
+    },
     "api/share.js": {
       "maxDuration": 30
     }
@@ -19,6 +22,10 @@
     {
       "source": "/api/describe",
       "destination": "/api/describe.js"
+    },
+    {
+      "source": "/api/study",
+      "destination": "/api/study.js"
     },
     {
       "source": "/api/share",

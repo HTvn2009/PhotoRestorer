@@ -1,10 +1,10 @@
 # PicRes AI Restoration
 
-PicRes restores and colorizes photographs with the OpenAI Images Edits API and analyzes historical or cultural context with the Responses API. The browser runs the interface; API routes run on the server so the API key remains private.
+Cultureach restores and colorizes photographs with the OpenAI Images Edits API, analyzes historical or cultural context with the Responses API, and lets users ask a Study Assistant about the uploaded image. The browser runs the interface; API routes run on the server so the API key remains private.
 
 Restoration follows a fixed workflow: preserve the original subject and composition, repair visible damage, improve clarity, colorize the image naturally, and keep the final PNG faithful to the uploaded photo.
 
-After restoration, PicRes calls `POST /api/describe` to classify the original image and return observed details, a cautious identification, confidence level, and verification warnings. It does not invent sources or assert an origin, date, location, or identity without evidence.
+After restoration, Cultureach calls `POST /api/describe` to classify the original image and return observed details, a cautious identification, confidence level, and verification warnings. The Study Assistant uses `POST /api/study` to answer user questions from the uploaded image and user-provided context. It does not invent sources or assert an origin, date, location, or identity without evidence.
 
 ## Run locally
 
@@ -31,5 +31,6 @@ Visitors can view the prepared projects, but there is no browser UI for adding, 
 
 - `POST /api/restore`: restores an image.
 - `POST /api/describe`: analyzes the original image with vision and returns structured JSON for the interface.
+- `POST /api/study`: answers Study Assistant questions about the uploaded image.
 
-For a Vercel deployment, set `OPENAI_API_KEY` for both `api/restore.js` and `api/describe.js`.
+For a Vercel deployment, set `OPENAI_API_KEY` for `api/restore.js`, `api/describe.js`, and `api/study.js`.

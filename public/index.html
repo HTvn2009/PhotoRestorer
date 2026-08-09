@@ -114,24 +114,24 @@
     <aside class="chat-panel" aria-label="AI image assistant">
       <div class="chat-heading">
         <div class="assistant-avatar">✦</div>
-        <div><p>PicRes Assistant</p><small><i></i> Online</small></div>
+        <div><p>Study Assistant</p><small><i></i> Online</small></div>
         <button class="more-button" aria-label="Chat options">•••</button>
       </div>
-      <div class="chat-content">
+      <div class="chat-content" id="chatMessages" aria-live="polite">
         <div class="chat-orb">✦</div>
         <h2>How can I help?</h2>
-        <p>Ask about the image you upload, its details, or how to get the best restoration.</p>
-        <div class="suggestions">
-          <button>What can be restored?</button>
-          <button>Describe this image</button>
-          <button>How does PicRes work?</button>
-        </div>
+        <p>Upload an image, then ask about visible details, possible cultural context, or what should be verified.</p>
+      </div>
+      <div class="suggestions" id="chatSuggestions">
+        <button type="button" data-question="Describe this image">Describe this image</button>
+        <button type="button" data-question="What culture might it relate to?">What culture might it relate to?</button>
+        <button type="button" data-question="What details should I notice?">What details should I notice?</button>
       </div>
       <div class="chat-input-wrap">
-        <input type="text" aria-label="Question for the assistant" placeholder="Ask about your image...">
-        <button aria-label="Send question">↑</button>
+        <input id="chatInput" type="text" aria-label="Question for the assistant" placeholder="Ask about your image..." disabled>
+        <button id="chatSend" type="button" aria-label="Send question" disabled>↑</button>
       </div>
-      <p class="chat-note">AI assistant is ready when you are</p>
+      <p class="chat-note" id="chatNote">Upload an image to start asking.</p>
     </aside>
   </main>
 

@@ -45,6 +45,18 @@ const descriptionSchema = {
   },
   required: ['category', 'observedDetails', 'identification', 'description', 'origin', 'buildPeriod', 'purpose', 'significance', 'historicalContext', 'warnings', 'humanCheck', 'sourceSearchRecommended']
 };
+const studySchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    answer: { type: 'string' },
+    suggestedQuestions: {
+      type: 'array',
+      items: { type: 'string' }
+    }
+  },
+  required: ['answer', 'suggestedQuestions']
+};
 
 const DESCRIBE_INSTRUCTIONS = [
   'You analyze photographs for a cultural and historical photo-restoration product.',
@@ -60,6 +72,17 @@ const DESCRIBE_INSTRUCTIONS = [
   'For uncertain identification, use cautious wording, set low or medium confidence, add a warning, and set humanCheck to true.',
   'For non-famous people, never infer identity, private information, or sensitive traits.',
   'Do not invent sources, citations, stories, text, symbols, or historical claims. sourceSearchRecommended may be true for a plausible historical, cultural, artifact, or landmark candidate, but no source is verified in this response.'
+].join(' ');
+
+const STUDY_INSTRUCTIONS = [
+  'You are Cultureach Study Assistant for a cultural and historical image-learning app.',
+  'Answer the user question using only visible evidence in the uploaded image and any user-provided title or context.',
+  'Write in clear, natural English for a student. Keep the answer concise but useful, usually 80 to 160 words.',
+  'Separate what is visible from what is only a possible interpretation. Use cautious wording for uncertain culture, date, origin, identity, event, or function.',
+  'Do not claim a specific culture, period, landmark, person, source, or story as fact unless the image or user context supports it.',
+  'For non-famous people, do not identify identity, private information, sensitive traits, ethnicity, religion, or nationality from appearance.',
+  'When helpful, mention what details the user should inspect next and what would need human or source verification.',
+  'Return only JSON that matches the schema. suggestedQuestions must be three short follow-up questions.'
 ].join(' ');
 
 function parseDescribeResponse(aiResult) {
@@ -105,6 +128,10 @@ function readBody(request) {
     request.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     request.on('error', reject);
   });
+}
+
+function parseJsonResponse(aiResult) {
+  return parseDescribeResponse(aiResult);
 }
 
 function readShareBody(request) {
@@ -232,10 +259,62 @@ async function describe(request, response) {
   }
 }
 
+async function study(request, response) {
+  if (!process.env.OPENAI_API_KEY) return sendJson(response, 503, { error: 'OPENAI_API_KEY is not configured on the server.' });
+  try {
+    const payload = JSON.parse(await readBody(request));
+    const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(payload.image || '');
+    if (!match) return sendJson(response, 400, { error: 'Only valid JPG, PNG, or WEBP images are accepted.' });
+    if (Buffer.from(match[2], 'base64').length > MAX_IMAGE_BYTES) return sendJson(response, 413, { error: 'Image exceeds the 10 MB limit.' });
+
+    const question = String(payload.question || '').trim().slice(0, 500);
+    if (!question) return sendJson(response, 400, { error: 'Question is required.' });
+
+    const title = String(payload.title || '').slice(0, 120);
+    const userContext = String(payload.context || '').slice(0, 600);
+    const aiResponse = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-5.6',
+        store: false,
+        instructions: STUDY_INSTRUCTIONS,
+        input: [{
+          role: 'user',
+          content: [
+            { type: 'input_text', text: `User-provided title: ${title || '(none)'}. User-provided context: ${userContext || '(none)'}. User question: ${question}` },
+            { type: 'input_image', image_url: payload.image, detail: 'high' }
+          ]
+        }],
+        text: { format: { type: 'json_schema', name: 'cultureach_study_answer', strict: true, schema: studySchema } }
+      })
+    });
+    const aiResult = await aiResponse.json();
+    if (!aiResponse.ok) return sendJson(response, aiResponse.status, { error: aiResult?.error?.message || 'The AI service could not answer the question.' });
+
+    let studyAnswer;
+    try {
+      studyAnswer = parseJsonResponse(aiResult);
+    } catch (error) {
+      return sendJson(response, 502, { error: 'The AI service returned a malformed study answer.' });
+    }
+
+    if (!studyAnswer?.answer) return sendJson(response, 502, { error: 'The AI service did not return a study answer.' });
+    return sendJson(response, 200, {
+      answer: studyAnswer.answer,
+      suggestedQuestions: Array.isArray(studyAnswer.suggestedQuestions) ? studyAnswer.suggestedQuestions.slice(0, 3) : []
+    });
+  } catch (error) {
+    console.error('Study error:', error);
+    return sendJson(response, 500, { error: error.message || 'An internal error occurred while answering the question.' });
+  }
+}
+
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   if (request.method === 'POST' && url.pathname === '/api/restore') return restore(request, response);
   if (request.method === 'POST' && url.pathname === '/api/describe') return describe(request, response);
+  if (request.method === 'POST' && url.pathname === '/api/study') return study(request, response);
   if (url.pathname === '/api/share' || url.pathname.startsWith('/api/share/')) return shareProject(request, response, url);
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
   const requested = url.pathname === '/' || url.pathname.startsWith('/share/') ? 'a.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
