@@ -77,19 +77,28 @@ Observed details:
 - Faint geometric decoration
 - Small loop handles on the sides
 - Displayed in a glass case on a red cushion
-Identification note: The broad decorated top, waisted body, side handles, and aged bronze-like patina resemble Southeast Asian ceremonial bronze drums, but no readable label or distinctive motif confirms the type.
-Warnings:
-- The user-provided title does not match the visible object.
-- The precise type, origin, and age cannot be verified from the photograph alone.
-Human verification recommended.`,
+Identification note: The broad decorated top, waisted body, side handles, and aged bronze-like patina resemble Southeast Asian ceremonial bronze drums, but no readable label or distinctive motif confirms the type.`,
       beforeImage: 'showcase/trong-dong-dong-son-before.webp',
       afterImage: 'showcase/trong-dong-dong-son-after.png'
     },
     {
-      name: 'Traditional scene',
-      description: 'A restored cultural scene example focused on improving faded contrast, preserving clothing and architectural details, and adding restrained natural color.',
-      beforeImage: 'showcase/traditional-scene-before.jpg',
-      afterImage: 'showcase/traditional-scene-after.jpg'
+      name: 'Mountain Rushmore in building',
+      description: `Subject: Mount Rushmore during construction
+Description: This black-and-white photograph appears to show Mount Rushmore while carving was still underway. George Washington’s monumental face is prominent at left, while another presidential portrait is emerging from the granite near the center. Pale, freshly worked surfaces contrast with the darker, deeply fractured natural rock around them. Cables hanging from the summit indicate the suspended equipment used by workers on the steep cliff. The unfinished setting offers a striking view of the memorial as both sculpture and construction site, before its four presidential figures reached their familiar final appearance.
+Origin: Black Hills near Keystone, South Dakota, United States
+Build time / period: Carved from 1927 to 1941
+Purpose: Created as a monumental memorial representing four United States presidents.
+Significance: Mount Rushmore became one of the most recognizable monumental sculptures and landmarks in the United States.
+Historical / cultural context: The memorial was designed and directed by sculptor Gutzon Borglum, with work continuing after his death under Lincoln Borglum until 1941. The exact date and stage shown in this photograph are not established from the image alone.
+Observed details:
+- A large carved presidential face appears on the left
+- A second face is partially formed near the center
+- Broad pale areas show recently worked stone
+- Rough, uncarved granite surrounds the sculpture
+- Cables descend from above the mountaintop
+Identification note: The monumental presidential portraits carved into exposed granite, together with the unfinished surfaces and suspended cables, match well-known construction views of Mount Rushmore.`,
+      beforeImage: 'showcase/rushmore-before.jpg',
+      afterImage: 'showcase/rushmore-after.png'
     }
   ];
 
