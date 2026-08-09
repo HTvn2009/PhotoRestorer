@@ -475,7 +475,7 @@ async function renderSavedGallery() {
       createSavedActionButton(item.favorite ? '★' : '☆', item.favorite ? 'Remove favorite' : 'Add favorite', () => toggleFavorite(item)),
       createSavedActionButton('✎', 'Rename project', () => renameSavedProject(item)),
       createSavedActionButton('↗', 'Share project', () => createShareLink(item)),
-      createSavedActionButton('×', 'Delete project', () => removeSavedProject(item))
+      createSavedActionButton('🗑︎', 'Delete project', () => removeSavedProject(item), 'danger')
     );
 
     row.append(nameButton, actions);
@@ -521,9 +521,9 @@ async function updateSavedGalleryItem(item) {
   await runGalleryStore('readwrite', store => store.put(item));
 }
 
-function createSavedActionButton(label, title, onClick) {
+function createSavedActionButton(label, title, onClick, variant = '') {
   const button = document.createElement('button');
-  button.className = 'icon-button small saved-action-button';
+  button.className = `icon-button small saved-action-button${variant ? ` ${variant}` : ''}`;
   button.type = 'button';
   button.textContent = label;
   button.title = title;
@@ -580,7 +580,8 @@ async function createShareLink(sourceItem) {
 
   if (!sourceItem) {
     shareSavedProject.disabled = true;
-    shareSavedProject.innerHTML = '<span>↗</span> Sharing...';
+    shareSavedProject.textContent = '↗';
+    shareSavedProject.setAttribute('aria-label', 'Sharing project');
   }
 
   try {
@@ -610,7 +611,8 @@ async function createShareLink(sourceItem) {
   } finally {
     if (!sourceItem) {
       shareSavedProject.disabled = false;
-      shareSavedProject.innerHTML = '<span>↗</span> Share';
+      shareSavedProject.textContent = '↗';
+      shareSavedProject.setAttribute('aria-label', 'Share project');
     }
   }
 }

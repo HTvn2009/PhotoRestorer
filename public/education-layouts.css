@@ -407,6 +407,15 @@ textarea:focus {
   background: #c2410c;
   border-color: #c2410c;
 }
+.icon-button.danger {
+  color: #fff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+.icon-button.danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
 .description-section {
   padding: 18px;
 }
