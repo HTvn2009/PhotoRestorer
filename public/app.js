@@ -45,6 +45,8 @@ if (typeof document === 'undefined') {
   const shareLinkRow = document.getElementById('shareLinkRow');
   const shareLink = document.getElementById('shareLink');
   const copyShareLink = document.getElementById('copyShareLink');
+  const showcaseList = document.getElementById('showcaseList');
+  const showcaseEmpty = document.getElementById('showcaseEmpty');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
@@ -61,6 +63,35 @@ if (typeof document === 'undefined') {
   let restoreProgressIndex = 0;
   const galleryDbName = 'picresGallery';
   const galleryStoreName = 'savedImages';
+  const showcaseProjects = [
+    {
+      name: 'Bronze Drum Dong Son',
+      description: `Subject: Ancient bronze drum, possibly Dong Son-style
+Description: Despite the user-provided title "Old chair," the photograph shows a large metal vessel or drum displayed inside a glass case. It has a broad circular top, a waisted body, and small loop handles at the sides. Green and brown patination covers much of the surface, while faint bands of geometric ornament remain visible around the upper body and top. Its form resembles an ancient Southeast Asian bronze drum, possibly of the Dong Son tradition, though the exact culture, date, and origin cannot be confirmed from this image alone.
+Purpose: Possibly made for ceremonial use, communal signaling, or as a prestige object, if the bronze-drum identification is correct.
+Significance: Its form may belong to a wider Southeast Asian tradition in which cast bronze drums carried ceremonial and social importance.
+Historical / cultural context: Dong Son-style bronze drums are associated with ancient metalworking traditions in mainland and island Southeast Asia, but this particular object requires documentation before that association can be confirmed.
+Observed details:
+- Large circular metal top
+- Green and brown surface patina
+- Faint geometric decoration
+- Small loop handles on the sides
+- Displayed in a glass case on a red cushion
+Identification note: The broad decorated top, waisted body, side handles, and aged bronze-like patina resemble Southeast Asian ceremonial bronze drums, but no readable label or distinctive motif confirms the type.
+Warnings:
+- The user-provided title does not match the visible object.
+- The precise type, origin, and age cannot be verified from the photograph alone.
+Human verification recommended.`,
+      beforeImage: 'showcase/trong-dong-dong-son-before.webp',
+      afterImage: 'showcase/trong-dong-dong-son-after.png'
+    },
+    {
+      name: 'Traditional scene',
+      description: 'A restored cultural scene example focused on improving faded contrast, preserving clothing and architectural details, and adding restrained natural color.',
+      beforeImage: 'showcase/traditional-scene-before.jpg',
+      afterImage: 'showcase/traditional-scene-after.jpg'
+    }
+  ];
 
   const restoreSteps = [
     { percent: 8, title: 'Preparing image' },
@@ -298,6 +329,60 @@ function escapeHtml(input) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function createShowcaseFigure(project, imageType) {
+  const figure = document.createElement('figure');
+  figure.className = 'showcase-figure';
+
+  const image = document.createElement('img');
+  image.src = project[`${imageType}Image`];
+  image.alt = `${project.name} ${imageType} restoration image`;
+  image.loading = 'lazy';
+  image.addEventListener('error', () => {
+    image.remove();
+    const missing = document.createElement('div');
+    missing.className = 'showcase-missing';
+    missing.textContent = `Add ${project[`${imageType}Image`]} to show this ${imageType} image.`;
+    figure.prepend(missing);
+  });
+
+  const caption = document.createElement('figcaption');
+  caption.textContent = imageType === 'before' ? 'Before' : 'After';
+
+  figure.append(image, caption);
+  return figure;
+}
+
+function renderShowcase() {
+  if (!showcaseList) return;
+
+  const visibleProjects = showcaseProjects.filter(project =>
+    project?.name && project?.description && project?.beforeImage && project?.afterImage
+  );
+
+  if (showcaseEmpty) showcaseEmpty.hidden = visibleProjects.length > 0;
+  showcaseList.replaceChildren(...visibleProjects.map(project => {
+    const card = document.createElement('article');
+    card.className = 'showcase-card';
+
+    const compare = document.createElement('div');
+    compare.className = 'showcase-compare';
+    compare.append(createShowcaseFigure(project, 'before'), createShowcaseFigure(project, 'after'));
+
+    const content = document.createElement('div');
+    content.className = 'showcase-content';
+
+    const title = document.createElement('h3');
+    title.textContent = project.name;
+
+    const text = document.createElement('p');
+    text.textContent = project.description;
+
+    content.append(title, text);
+    card.append(compare, content);
+    return card;
+  }));
 }
 
 async function describeImage() {
@@ -754,6 +839,7 @@ favoriteFilter.addEventListener('change', () => {
   renderSavedGallery();
 });
 loadSharedProjectFromUrl().then((loadedShare) => {
+  renderShowcase();
   if (!loadedShare) {
     renderSavedGallery();
     activateTab('mainMenu');

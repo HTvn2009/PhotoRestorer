@@ -6,7 +6,15 @@ const ROOT = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT || 3000);
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_SHARE_BYTES = 12 * 1024 * 1024;
-const MIME_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp'
+};
 const shares = new Map();
 const RESTORE_PROMPT = [
   'Restore this uploaded image by following these steps in order:',
@@ -232,8 +240,11 @@ const server = http.createServer((request, response) => {
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
   const requested = url.pathname === '/' || url.pathname.startsWith('/share/') ? 'a.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
   const allowedFiles = new Set(['index.html', 'app.js', 'style.css', 'a.html', 'e.html', 'education-layouts.css', 'option-a.html', 'option-b.html', 'concepts.css', 'option-c.html', 'option-d.html', 'option-e.html', 'ui-options.css']);
-  if (!allowedFiles.has(requested)) { response.writeHead(404); return response.end('Not found'); }
+  const isShowcaseImage = requested.startsWith('showcase/')
+    && ['.jpg', '.jpeg', '.png', '.webp'].includes(path.extname(requested).toLowerCase());
+  if (!allowedFiles.has(requested) && !isShowcaseImage) { response.writeHead(404); return response.end('Not found'); }
   const filePath = path.resolve(ROOT, requested);
+  if (!filePath.startsWith(`${ROOT}${path.sep}`)) { response.writeHead(404); return response.end('Not found'); }
   if (!fs.existsSync(filePath)) { response.writeHead(404); return response.end('Not found'); }
   response.writeHead(200, { 'Content-Type': MIME_TYPES[path.extname(filePath)] || 'application/octet-stream' });
   if (request.method === 'HEAD') return response.end();

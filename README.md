@@ -17,6 +17,16 @@ npm start
 
 Open `http://localhost:3000`. JPG, PNG, and WEBP images are currently limited to 10 MB.
 
+## Showcase projects
+
+Prepared Showcase tab projects are controlled from source code only:
+
+1. Add each before/after image to `public/showcase/`.
+2. Edit the `showcaseProjects` array in `public/app.js`.
+3. Use image paths like `showcase/my-project-before.jpg` and `showcase/my-project-after.jpg`.
+
+Visitors can view the prepared projects, but there is no browser UI for adding, editing, or deleting Showcase items.
+
 ## API
 
 - `POST /api/restore`: restores an image.
