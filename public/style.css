@@ -1,6 +1,8 @@
 :root {
   --accent: #8d6bff;
   --accent-2: #b8a7ff;
+  --brand-orange: #f47a20;
+  --brand-yellow: #f5bf2f;
   --bg: #12131a;
   --surface: #1a1c25;
   --surface-2: #22242f;
@@ -56,12 +58,34 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
   align-items: center;
   gap: 9px;
   color: var(--text);
-  font: 700 25px "Space Grotesk", sans-serif;
-  letter-spacing: -1px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.logo > span:last-child > span { color: var(--accent-2); }
+.logo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+}
+
+.logo-name {
+  font-size: 25px;
+  letter-spacing: -1px;
+}
+
+.logo-culture { color: var(--brand-orange); }
+
+.logo-each { color: var(--brand-yellow); }
+
+.logo small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
 
 .logo-mark {
   display: grid;
