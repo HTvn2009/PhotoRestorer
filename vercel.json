@@ -26,11 +26,11 @@
     },
     {
       "source": "/share/:id",
-      "destination": "/index.html"
+      "destination": "/a.html"
     },
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/a.html"
     }
   ]
 }
