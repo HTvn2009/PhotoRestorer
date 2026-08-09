@@ -411,6 +411,13 @@ function closeGalleryDetail() {
   }
 }
 
+function getShareUrl(item) {
+  if (!item) return '';
+  if (item.shareUrl) return item.shareUrl;
+  if (item.id) return new URL(`/share/${item.id}`, window.location.origin).href;
+  return '';
+}
+
 function openGalleryDetail(item) {
   if (!savedDetail || !item) return;
   activeSavedId = item.id;
@@ -426,8 +433,9 @@ function openGalleryDetail(item) {
     favoriteSavedProject.setAttribute('aria-label', favoriteSavedProject.title);
     favoriteSavedProject.classList.toggle('active', Boolean(item.favorite));
   }
-  if (shareLinkRow) shareLinkRow.hidden = !item.shareUrl;
-  if (shareLink) shareLink.value = item.shareUrl || '';
+  const shareUrl = getShareUrl(item);
+  if (shareLinkRow) shareLinkRow.hidden = !shareUrl;
+  if (shareLink) shareLink.value = shareUrl;
   if (savedDetailEmpty) savedDetailEmpty.hidden = true;
   savedDetail.hidden = false;
   savedList.querySelectorAll('.saved-list-item').forEach(button => {
@@ -647,10 +655,12 @@ async function loadSharedProjectFromUrl() {
     const response = await fetch(`/api/share?id=${encodeURIComponent(match[1])}`);
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to load shared project.');
-    activeSavedId = result.item.id;
+    const item = result.item;
+    item.shareUrl = new URL(`/share/${item.id}`, window.location.origin).href;
+    activeSavedId = item.id;
     galleryEmpty.hidden = true;
     savedList.replaceChildren();
-    openGalleryDetail(result.item);
+    openGalleryDetail(item);
     activateTab('gallery');
     setStatus('Viewing shared project');
     return true;
