@@ -72,7 +72,7 @@ if (typeof document === 'undefined') {
   let showcasePage = 0;
   const galleryDbName = 'picresGallery';
   const galleryStoreName = 'savedImages';
-  const showcasePageSize = 3;
+  const showcasePageSize = 2;
   const showcaseProjects = [
     {
       name: 'Bronze Drum Dong Son',
