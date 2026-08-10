@@ -11,7 +11,7 @@
 </head>
 <body class="layout-a light">
   <header class="topbar">
-    <a class="logo" href="#mainMenu" aria-label="Cultureach home">
+    <a class="logo" id="homeLogo" href="#mainMenu" aria-label="Cultureach home">
       <span class="logo-mark">C</span>
       <span class="logo-copy">
         <span class="logo-name"><span class="logo-culture">Culture</span><span class="logo-each">each</span></span>
@@ -57,7 +57,7 @@
           </div>
         </article>
       </div>
-      <section class="description-section"><div class="label-row"><label class="field-label" for="description">Description</label><span>AI-generated details you can edit</span></div><div class="action-row description-actions"><button class="button primary" id="descriptionReload"><span>&#10022;</span> Run description</button></div><textarea id="description" readonly placeholder="Your image description will appear here..."></textarea><div class="action-row save-actions"><button class="button secondary" id="saveButton" disabled><span>&#8595;</span> Save</button></div></section>
+      <section class="description-section"><div class="label-row"><label class="field-label" for="description">Description</label><span>AI-generated details you can edit</span></div><div class="action-row description-actions"><button class="button primary" id="descriptionReload"><span>&#10022;</span> Run description</button></div><textarea id="description" readonly placeholder="Your image description will appear here..."></textarea><div class="action-row save-actions"><button class="button secondary" id="saveButton" disabled><span>&#8595;</span> Save</button><button class="button secondary" id="resetWorkspace" type="button">Reset</button></div></section>
     </section>
     <aside class="chat-panel" aria-label="Learning assistant">
       <div class="chat-heading"><div class="assistant-avatar">?</div><div><p>Study Assistant</p></div><button class="more-button" aria-label="Chat options">&#8226;&#8226;&#8226;</button></div>

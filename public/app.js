@@ -1,7 +1,9 @@
 if (typeof document === 'undefined') {
   console.warn('Skipping browser UI bootstrap because document is unavailable in this runtime.');
 } else {
+  const homeLogo = document.getElementById('homeLogo');
   const themeButton = document.getElementById('themeToggle');
+  const resetWorkspaceButton = document.getElementById('resetWorkspace');
   const uploadZone = document.getElementById('uploadZone');
   const imageUpload = document.getElementById('imageUpload');
   const imagePreview = document.getElementById('imagePreview');
@@ -318,6 +320,28 @@ function clearResult({ clearDescription = true } = {}) {
   if (analysisCard) analysisCard.hidden = true;
 }
 
+function resetWorkspace() {
+  if (isProcessing || isDescribing || isStudying) {
+    setStatus('Please wait for the current task to finish');
+    return;
+  }
+
+  selectedFile = null;
+  selectedOriginalDataUrl = null;
+  if (imageUpload) imageUpload.value = '';
+  if (previewImage) previewImage.removeAttribute('src');
+  if (imagePreview) imagePreview.hidden = true;
+  if (imageFileName) imageFileName.textContent = '';
+  if (imageFileDetails) imageFileDetails.textContent = '';
+  const uploadPlaceholder = uploadZone?.querySelector('.upload-placeholder');
+  if (uploadPlaceholder) uploadPlaceholder.hidden = false;
+  if (imageName) imageName.value = '';
+  if (imageContext) imageContext.value = '';
+  clearResult();
+  clearStudyAssistant();
+  setStatus('Ready to create');
+}
+
 function showImage(file) {
   if (!file || !file.type.startsWith('image/')) return;
 
@@ -368,6 +392,19 @@ function setStudyWelcome() {
 function resetStudyChat() {
   setStudyWelcome();
   if (chatInput) chatInput.value = '';
+}
+
+function clearStudyAssistant() {
+  if (chatMessages) chatMessages.replaceChildren();
+  if (chatInput) {
+    chatInput.value = '';
+    chatInput.disabled = true;
+  }
+  if (chatSend) chatSend.disabled = true;
+  chatSuggestionButtons.forEach(button => {
+    button.disabled = true;
+  });
+  if (chatNote) chatNote.textContent = '';
 }
 
 function updateStudyChatState() {
@@ -1086,6 +1123,17 @@ tabButtons.forEach(button => {
     activateTab(button.dataset.target);
   });
 });
+
+if (homeLogo) {
+  homeLogo.addEventListener('click', (event) => {
+    event.preventDefault();
+    activateTab('mainMenu');
+  });
+}
+
+if (resetWorkspaceButton) {
+  resetWorkspaceButton.addEventListener('click', resetWorkspace);
+}
 
 helpQuestions.forEach(button => {
   button.addEventListener('click', () => toggleHelpItem(button));
