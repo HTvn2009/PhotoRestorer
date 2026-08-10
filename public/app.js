@@ -104,10 +104,10 @@ Observed details:
 Identification note: The monumental presidential portraits carved into exposed granite, together with the unfinished surfaces and suspended cables, match well-known construction views of Mount Rushmore.`,
       beforeImage: 'showcase/rushmore-before.jpg',
       afterImage: 'showcase/rushmore-after.png'
-    }
+    },
     {
-      name: 'Chu Dau ceremic plate'
-      description:`Subject: Decorated East Asian ceramic dish, possibly Vietnamese
+      name: 'Chu Dau ceramic plate',
+      description: `Subject: Decorated East Asian ceramic dish, possibly Vietnamese
 Description: A large, shallow ceramic dish is displayed upright on a stand. Its central field contains a delicate landscape of trees, rocky outcrops, vegetation, and distant hills, painted in blue, green, ochre, and reddish-brown on a pale glazed ground. Around the broad rim, repeated leaf-shaped panels alternate with smaller curling motifs and scattered green dots. Fine surface lines, uneven coloring, and areas of wear suggest age or prolonged handling. The decorative scheme appears East Asian and may be Vietnamese, although its precise place of manufacture, date, and original function cannot be confirmed from the photograph alone.
 Purpose: Likely made as a functional or presentation dish and now preserved for display.
 Significance: The dish reflects a landscape-centered ceramic decorative tradition using restrained polychrome painting and repeated border motifs.
@@ -117,7 +117,7 @@ Observed details:
 - Blue, green, ochre, and reddish-brown painted decoration
 - Leaf-shaped panels arranged around the broad rim
 - Displayed upright on a dark stand
-Identification note: The painted landscape, restrained multicolor palette, and rim panels are consistent with East Asian ceramic traditions, but the photograph provides no label, mark, date, or provenance.`
+Identification note: The painted landscape, restrained multicolor palette, and rim panels are consistent with East Asian ceramic traditions, but the photograph provides no label, mark, date, or provenance.`,
       beforeImage: 'showcase/dia-gom-chu-dau-before.webp',
       afterImage: 'showcase/dia-gom-chu-dau-after.png'
     }
