@@ -733,6 +733,47 @@ textarea:focus {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
 }
 
+.showcase-page-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.showcase-page-button {
+  position: fixed;
+  top: 50%;
+  z-index: 20;
+  display: grid;
+  width: 54px;
+  height: 86px;
+  padding: 0;
+  border: 1px solid rgba(32,33,36,.08);
+  color: rgba(32,33,36,.62);
+  background: rgba(255,255,255,.42);
+  box-shadow: 0 12px 30px rgba(32,33,36,.12);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 58px;
+  line-height: 1;
+  place-items: center;
+  transform: translateY(-50%);
+  transition: background .2s ease, color .2s ease, opacity .2s ease;
+}
+
+.showcase-page-button.previous { left: 14px; }
+.showcase-page-button.next { right: 14px; }
+
+.showcase-page-button:hover:not(:disabled) {
+  color: var(--orange-dark);
+  background: rgba(255,255,255,.78);
+}
+
+.showcase-page-button:disabled {
+  opacity: .22;
+  cursor: default;
+}
+
 .showcase-card {
   display: grid;
   overflow: hidden;
@@ -1016,6 +1057,16 @@ body.dark .output-zone { background: var(--paper-2); }
   nav { flex-wrap: wrap; }
   nav a { padding: 8px 10px; font-size: 12px; }
   .app-layout { padding: 18px; }
+  .showcase-page-button {
+    top: auto;
+    bottom: 18px;
+    width: 44px;
+    height: 54px;
+    font-size: 42px;
+    transform: none;
+  }
+  .showcase-page-button.previous { left: 18px; }
+  .showcase-page-button.next { right: 18px; }
   .section-heading { flex-direction: column; }
   .status { white-space: normal; }
   .description-section {

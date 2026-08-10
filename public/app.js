@@ -46,6 +46,9 @@ if (typeof document === 'undefined') {
   const copyShareLink = document.getElementById('copyShareLink');
   const showcaseList = document.getElementById('showcaseList');
   const showcaseEmpty = document.getElementById('showcaseEmpty');
+  const showcasePrevious = document.getElementById('showcasePrevious');
+  const showcaseNext = document.getElementById('showcaseNext');
+  const showcasePageStatus = document.getElementById('showcasePageStatus');
   const tabButtons = Array.from(document.querySelectorAll('nav a[data-target]'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   const helpQuestions = Array.from(document.querySelectorAll('.help-question'));
@@ -66,8 +69,10 @@ if (typeof document === 'undefined') {
   let isStudying = false;
   let restoreProgressTimer = null;
   let restoreProgressIndex = 0;
+  let showcasePage = 0;
   const galleryDbName = 'picresGallery';
   const galleryStoreName = 'savedImages';
+  const showcasePageSize = 3;
   const showcaseProjects = [
     {
       name: 'Bronze Drum Dong Son',
@@ -492,9 +497,26 @@ function renderShowcase() {
   const visibleProjects = showcaseProjects.filter(project =>
     project?.name && project?.description && project?.beforeImage && project?.afterImage
   );
+  const pageCount = Math.max(1, Math.ceil(visibleProjects.length / showcasePageSize));
+  showcasePage = Math.min(showcasePage, pageCount - 1);
+  const pageStart = showcasePage * showcasePageSize;
+  const pageProjects = visibleProjects.slice(pageStart, pageStart + showcasePageSize);
 
   if (showcaseEmpty) showcaseEmpty.hidden = visibleProjects.length > 0;
-  showcaseList.replaceChildren(...visibleProjects.map(project => {
+  if (showcasePrevious) {
+    showcasePrevious.hidden = visibleProjects.length === 0;
+    showcasePrevious.disabled = showcasePage === 0;
+  }
+  if (showcaseNext) {
+    showcaseNext.hidden = visibleProjects.length === 0;
+    showcaseNext.disabled = showcasePage >= pageCount - 1;
+  }
+  if (showcasePageStatus) {
+    showcasePageStatus.hidden = visibleProjects.length <= showcasePageSize;
+    showcasePageStatus.textContent = `Page ${showcasePage + 1} of ${pageCount}`;
+  }
+
+  showcaseList.replaceChildren(...pageProjects.map(project => {
     const card = document.createElement('article');
     card.className = 'showcase-card';
 
@@ -515,6 +537,23 @@ function renderShowcase() {
     card.append(compare, content);
     return card;
   }));
+}
+
+function changeShowcasePage(direction) {
+  const visibleCount = showcaseProjects.filter(project =>
+    project?.name && project?.description && project?.beforeImage && project?.afterImage
+  ).length;
+  const pageCount = Math.max(1, Math.ceil(visibleCount / showcasePageSize));
+  showcasePage = Math.max(0, Math.min(pageCount - 1, showcasePage + direction));
+  renderShowcase();
+}
+
+if (showcasePrevious) {
+  showcasePrevious.addEventListener('click', () => changeShowcasePage(-1));
+}
+
+if (showcaseNext) {
+  showcaseNext.addEventListener('click', () => changeShowcasePage(1));
 }
 
 async function describeImage() {
