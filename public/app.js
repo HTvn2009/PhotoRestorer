@@ -9,7 +9,6 @@ if (typeof document === 'undefined') {
   const imageFileName = document.getElementById('imageFileName');
   const imageFileDetails = document.getElementById('imageFileDetails');
   const runButton = document.getElementById('runImage');
-  const retryButton = document.getElementById('retryImage');
   const saveButton = document.getElementById('saveButton');
   const restoredImage = document.getElementById('restoredImage');
   const outputResult = document.getElementById('outputResult');
@@ -198,7 +197,7 @@ function clearResult({ clearDescription = true } = {}) {
   if (outputResult) outputResult.hidden = true;
   if (outputPlaceholder) outputPlaceholder.hidden = false;
   if (outputText) outputText.textContent = 'will appear here after processing';
-  retryButton.disabled = true;
+  runButton.innerHTML = '<span>&#10022;</span> Run restoration';
   saveButton.disabled = true;
   if (clearDescription && description) description.value = '';
   if (clearDescription && description) description.readOnly = true;
@@ -349,8 +348,7 @@ async function restoreImage() {
   isProcessing = true;
   clearResult({ clearDescription: false });
   runButton.disabled = true;
-  retryButton.disabled = true;
-  runButton.innerHTML = '<span>✦</span> Restoring...';
+  runButton.innerHTML = '<span>&#10022;</span> Restoring...';
   setStatus('Repairing, enhancing, and colorizing image', true);
   startOutputProgress();
 
@@ -377,7 +375,6 @@ async function restoreImage() {
     if (outputProgress) outputProgress.hidden = true;
     outputText.textContent = 'Restored and colorized image ready';
     outputResult.hidden = false;
-    retryButton.disabled = false;
     setStatus('Restoration complete');
     saveButton.disabled = false;
   } catch (error) {
@@ -387,8 +384,7 @@ async function restoreImage() {
   } finally {
     isProcessing = false;
     runButton.disabled = false;
-    runButton.innerHTML = '<span>✦</span> Run restoration';
-    if (restoredUrl) retryButton.disabled = false;
+    runButton.innerHTML = restoredUrl ? '<span>&#8635;</span> Retry restoration' : '<span>&#10022;</span> Run restoration';
   }
 }
 
@@ -915,7 +911,6 @@ function toggleHelpItem(button) {
 
 imageUpload.addEventListener('change', () => showImage(imageUpload.files[0]));
 runButton.addEventListener('click', restoreImage);
-retryButton.addEventListener('click', restoreImage);
 saveButton.addEventListener('click', saveToGallery);
 descriptionReload.addEventListener('click', () => {
   describeImage();

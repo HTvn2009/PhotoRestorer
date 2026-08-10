@@ -317,8 +317,8 @@ const server = http.createServer((request, response) => {
   if (request.method === 'POST' && url.pathname === '/api/study') return study(request, response);
   if (url.pathname === '/api/share' || url.pathname.startsWith('/api/share/')) return shareProject(request, response, url);
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
-  const requested = url.pathname === '/' || url.pathname.startsWith('/share/') ? 'a.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
-  const allowedFiles = new Set(['index.html', 'app.js', 'style.css', 'a.html', 'e.html', 'education-layouts.css', 'option-a.html', 'option-b.html', 'concepts.css', 'option-c.html', 'option-d.html', 'option-e.html', 'ui-options.css']);
+  const requested = url.pathname === '/' || url.pathname.startsWith('/share/') ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
+  const allowedFiles = new Set(['index.html', 'app.js', 'style.css', 'e.html', 'education-layouts.css', 'option-a.html', 'option-b.html', 'concepts.css', 'option-c.html', 'option-d.html', 'option-e.html', 'ui-options.css']);
   const isShowcaseImage = requested.startsWith('showcase/')
     && ['.jpg', '.jpeg', '.png', '.webp'].includes(path.extname(requested).toLowerCase());
   if (!allowedFiles.has(requested) && !isShowcaseImage) { response.writeHead(404); return response.end('Not found'); }

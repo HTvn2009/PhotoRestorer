@@ -387,6 +387,9 @@ textarea:focus {
   gap: 10px;
   margin: 18px 0 24px;
 }
+.restoration-actions {
+  margin: 0 0 16px;
+}
 .button,
 .icon-button {
   display: inline-flex;
@@ -449,7 +452,8 @@ textarea:focus {
   font-size: 12px;
 }
 #description { min-height: 210px; }
-.description-actions { margin-bottom: 0; }
+.description-actions { margin: 12px 0; }
+.save-actions { margin: 12px 0 0; }
 
 .chat-panel {
   display: flex;

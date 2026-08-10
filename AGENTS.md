@@ -4,7 +4,7 @@
 
 This is a lightweight photo-restoration web app with no build step. Keep the frontend assets at the repository root:
 
-- `MainMenu.html` is the page markup and the entry point served at `/`.
+- `index.html` is the page markup and the entry point served at `/`.
 - `style.css` contains all UI styles, themes, and responsive rules.
 - `app.js` owns browser-side upload, preview, API request, and download behavior.
 - `server.js` is the Node.js HTTP server. It serves the three static files and implements `POST /api/restore` using the OpenAI Images Edits API.

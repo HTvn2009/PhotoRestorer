@@ -33,11 +33,11 @@
     },
     {
       "source": "/share/:id",
-      "destination": "/a.html"
+      "destination": "/index.html"
     },
     {
       "source": "/",
-      "destination": "/a.html"
+      "destination": "/index.html"
     }
   ]
 }
