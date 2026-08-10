@@ -144,6 +144,42 @@ Observed details:
 Identification note: The three-pointed-star motifs, imposing radiator grille, separate headlamps, and long bonnet are consistent with Mercedes-Benz cars of the late 1920s or early 1930s, but the exact model is not verifiable from this view.`,
       beforeImage: 'showcase/fordcar1930-before.webp',
       afterImage: 'showcase/fordcar1930-after.png'
+    },
+    {
+      name: '"Carpentry workshop near Chuong Duong Bridge"(1992)',
+      description: `Subject: A carpentry and woodturning workshop near Chuong Duong Bridge in 1992
+Description: Two craftspeople work at woodturning lathes inside a crowded carpentry workshop, identified by the supplied title as being near Chuong Duong Bridge in 1992. One shapes a decorative spindle while the other works beside a larger rotating piece. Wood shavings coat their clothing, benches, and the floor, emphasizing the physical intensity of the labor. Finished and partly shaped components, drive belts, motors, hand tools, and stacked materials fill the compact room. The black-and-white image offers an intimate record of small-scale urban craft production and everyday working life in early-1990s Hanoi.
+Origin: Near Chuong Duong Bridge, Hanoi, Vietnam, according to the user-provided title.
+Purpose: A working carpentry shop used to turn and shape wooden components, possibly for furniture or architectural fittings.
+Significance: The scene preserves a close view of skilled manual labor and small-workshop wood production in Hanoi in 1992.
+Historical / cultural context: The user-provided date places the workshop in early-1990s Hanoi, a period of expanding private enterprise and economic change in Vietnam.
+Observed details:
+- Two workers operate woodturning equipment
+- Turned wooden spindles lie across the workbenches
+- Wood shavings cover the workers and surrounding surfaces
+- Belts, motors, tools, and materials crowd the small room
+- The photograph is black and white
+Identification note: The visible lathes, wooden spindles, tools, and heavy wood shavings clearly indicate a working carpentry shop; the location and date come from the user-provided title.`,
+      beforeImage: 'showcase/xuong-moc-gan-cau-chuong-duong-1992-soloman-before.jpg',
+      afterImage: 'showcase/xuong-moc-gan-cau-chuong-duong-1992-soloman-after.png'
+    },
+    {
+      name: 'Martin Luther King Jr. at a WNBC round table',
+      description: `Subject: A WNBC-TV public-affairs roundtable, possibly featuring Martin Luther King Jr.
+Description: This black-and-white photograph captures a formal television roundtable in progress. Five men in suits lean toward one another around a table scattered with papers, framed by bookshelves and wood-paneled walls. In the foreground, a camera labeled WNBC TV 4 and its silhouetted operator reveal the production setting. The clothing, equipment, and restrained studio design suggest a mid-20th-century public-affairs broadcast. One participant appears to resemble civil rights leader Martin Luther King Jr., which may indicate a discussion connected with contemporary social or political issues, though the people and program cannot be confirmed from the image alone.
+Origin: A television studio associated with WNBC-TV; the exact location is not confirmed.
+Purpose: To record or broadcast a formal panel discussion or interview.
+Significance: The image illustrates the role of television studios in presenting serious public discussion during the mid-20th century.
+Historical / cultural context: The equipment, dress, and visual style are consistent with American television production of the 1950s or 1960s, but an exact date is unsupported.
+Observed details:
+- Five suited men sit around a round table
+- A large studio camera is marked “WNBC TV” and “4”
+- A camera operator stands in silhouette
+- Bookshelves and wood-paneled walls form the set
+- Papers and printed material lie on the table
+Identification note: The station marking and studio arrangement are clearly visible, while one participant resembles Martin Luther King Jr.; no caption or other direct identification is provided.`,
+      beforeImage: 'showcase/DR-King-on-NBC-before.jpg',
+      afterImage: 'showcase/DR-King-on-NBC-after.png'
     }
   ];
 
