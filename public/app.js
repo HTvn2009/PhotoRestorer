@@ -220,6 +220,25 @@ Observed details:
 Identification note: The distinctive human head, lion body, desert setting, and nearby pyramid match the Great Sphinx, consistent with the user-provided title.`,
       beforeImage: 'showcase/Great-Sphinx-1880.jpg',
       afterImage: 'showcase/Great-Sphinx-1880-after.png'
+    },
+    {
+      name: 'Hanoi, entrance gate of the Temple of Literature (Văn Miếu)',
+      description: `ubject: The entrance gate of the Temple of Literature (Văn Miếu), Hà Nội, Vietnam
+Description: This historical photograph presents the entrance to Văn Miếu, the Temple of Literature in Hà Nội, viewed directly along a stone approach. The imposing central gateway rises in several levels, with arched passages, inscribed panels, curved rooflines, and ornamental finials. Smaller side gates and a low masonry wall complete the balanced composition. Founded as a Confucian temple, Văn Miếu became closely associated with scholarship and the training of officials through Vietnam’s historic imperial academy. The quiet, frontal view emphasizes the gateway’s ceremonial role and the architectural dignity of one of Hà Nội’s most important cultural monuments.
+Origin: Hà Nội, Vietnam
+Build time / period: The Văn Miếu complex was founded in 1070; the visible entrance reflects later construction and alterations within the historic site.
+Purpose: A ceremonial entrance to a Confucian temple and historic center of learning.
+Significance: Văn Miếu is a major symbol of Vietnamese education, scholarship, and Confucian heritage.
+Historical / cultural context: The complex housed institutions associated with Vietnam’s imperial academy and the education of scholar-officials. The exact date of this photograph is not established here.
+Observed details:
+- A symmetrical ceremonial gateway stands at the end of a straight stone path.
+- The central structure has three arched openings and several roof levels.
+- Curved roof corners, decorative finials, and inscribed panels ornament the gate.
+- Lower side entrances connect to a surrounding masonry wall.
+- The printed caption identifies the scene as the gate of Văn Miếu in Hà Nội.
+Identification note: The user-provided title and the photograph’s printed French and Vietnamese caption identify the site, while the architecture matches the monumental entrance of the Văn Miếu complex.`,
+      beforeImage: 'showcase/CongVanMieu-before.webp',
+      afterImage: 'showcase/CongVanMieu-after.png'
     }
   ];
 
