@@ -835,6 +835,9 @@ textarea:focus {
 .gallery-card { padding: 20px; }
 .gallery-card h3,
 .showcase-content h3 { margin: 0 0 8px; font-family: "Space Grotesk", Inter, sans-serif; }
+.showcase-content p {
+  white-space: pre-wrap;
+}
 .help-list { display: grid; gap: 12px; }
 .help-item { padding: 18px; }
 .help-question {

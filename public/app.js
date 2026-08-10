@@ -125,6 +125,25 @@ Observed details:
 Identification note: The painted landscape, restrained multicolor palette, and rim panels are consistent with East Asian ceramic traditions, but the photograph provides no label, mark, date, or provenance.`,
       beforeImage: 'showcase/dia-gom-chu-dau-before.webp',
       afterImage: 'showcase/dia-gom-chu-dau-after.png'
+    },
+    {
+      name: 'Ford car 1930s',
+      description: `Subject: Prewar Mercedes-Benz luxury automobile
+Description: This black-and-white photograph presents the imposing front of a prewar luxury automobile, possibly a Mercedes-Benz, displayed in a public exhibition setting. Its tall mesh radiator grille, large separate headlamps, long sculpted bonnet, and polished metal fittings reflect the formal styling of high-end cars from the late 1920s or early 1930s. A plate marked “MA-4603” and several motoring badges add period character. Seen close-up, the car conveys the craftsmanship, prestige, and monumental proportions associated with early European touring automobiles, while visitors and modern vehicles remain visible in the background.
+Origin: Possibly Germany, if the Mercedes-Benz identification is confirmed.
+Build time / period: Likely late 1920s to early 1930s, based on visible styling.
+Purpose: Luxury passenger transport; the photograph appears to show the vehicle on exhibition.
+Significance: An example of prewar luxury-car design, emphasizing hand-finished details, prominent radiator architecture, and prestige styling.
+Historical / cultural context: Cars of this type belonged to an era when European luxury manufacturers combined powerful touring performance with coachbuilt bodies and elaborate exterior fittings.
+Observed details:
+- Large upright mesh radiator grille
+- Two prominent round headlamps
+- Long bonnet with polished trim
+- Front plate reading “MA-4603”
+- Several automobile badges mounted below the grille
+Identification note: The three-pointed-star motifs, imposing radiator grille, separate headlamps, and long bonnet are consistent with Mercedes-Benz cars of the late 1920s or early 1930s, but the exact model is not verifiable from this view.`,
+      beforeImage: 'showcase/fordcar1930-before.webp',
+      afterImage: 'showcase/fordcar1930-after.png'
     }
   ];
 
