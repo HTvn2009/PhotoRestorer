@@ -99,9 +99,9 @@ nav a.active {
 
 .app-layout {
   min-height: calc(100vh - 72px);
-  padding: clamp(20px, 4vw, 48px);
+  padding: clamp(18px, 3vw, 36px) clamp(14px, 2.5vw, 32px);
 }
-#mainMenu.app-layout { display: grid; gap: 24px; }
+#mainMenu.app-layout { display: grid; gap: 18px; }
 .workspace {
   width: min(100%, 1180px);
   margin: 0 auto;
@@ -439,6 +439,8 @@ textarea:focus {
   border-color: #b91c1c;
 }
 .description-section {
+  width: calc(100% + 12px);
+  margin-left: -12px;
   padding: 18px;
 }
 .label-row {
@@ -809,7 +811,7 @@ textarea:focus {
 .help-details { padding-top: 12px; }
 
 .layout-a #mainMenu.app-layout {
-  grid-template-columns: minmax(0, 1.7fr) minmax(300px, .7fr);
+  grid-template-columns: minmax(0, 1.7fr) minmax(340px, .85fr);
   background:
     linear-gradient(90deg, transparent 0 31px, rgba(244,122,32,.08) 32px),
     var(--paper);
@@ -1016,6 +1018,10 @@ body.dark .output-zone { background: var(--paper-2); }
   .app-layout { padding: 18px; }
   .section-heading { flex-direction: column; }
   .status { white-space: normal; }
+  .description-section {
+    width: 100%;
+    margin-left: 0;
+  }
   .upload-zone,
   .output-zone { min-height: 250px; }
   .saved-detail-header { flex-direction: column; }
