@@ -180,6 +180,44 @@ Observed details:
 Identification note: The station marking and studio arrangement are clearly visible, while one participant resembles Martin Luther King Jr.; no caption or other direct identification is provided.`,
       beforeImage: 'showcase/DR-King-on-NBC-before.jpg',
       afterImage: 'showcase/DR-King-on-NBC-after.png'
+    },
+    {
+      name: 'Eiffel Tower mid-construction',
+      description: `Subject: The Eiffel Tower during construction
+Description: This black-and-white photograph shows the Eiffel Tower rising unfinished above an open construction ground. Its four immense lattice-iron legs curve inward around the central arch, while cranes and temporary structures mark the incomplete upper level. A broad platform spans the tower, and a large symmetrical building is neatly framed beneath it in the distance. A lone figure in the foreground emphasizes the structure’s extraordinary scale. Built for the 1889 Exposition Universelle in Paris, the tower was a daring engineering project that later became one of France’s most recognized landmarks and an enduring symbol of modern industrial design.
+Origin: Paris, France
+Build time / period: Constructed from 1887 to 1889.
+Purpose: Designed as a monumental centerpiece and entrance feature for the 1889 Exposition Universelle.
+Significance: The Eiffel Tower became an internationally recognized symbol of Paris and a landmark achievement in nineteenth-century iron engineering.
+Historical / cultural context: The tower was erected during a period of major industrial exhibitions celebrating engineering, manufacturing, and technological progress.
+Observed details:
+- Four iron lattice legs rise toward an unfinished upper section
+- Cranes and temporary construction elements stand at the top
+- A broad platform crosses the structure above the main arch
+- A large symmetrical building is framed beneath the tower
+- The foreground is bare ground with a lone figure
+Identification note: The title identifies the subject, and the tower’s four curved lattice supports, broad lower arch, and platform arrangement match the Eiffel Tower.`,
+      beforeImage: 'showcase/EiffelTower-midConstruct-before.jpg',
+      afterImage: 'showcase/EiffelTower-midConstruct-after.png'
+    },
+    {
+      name: 'One of the oldest photos of the Great Sphinx, from 1880',
+      description: `Subject: The Great Sphinx of Giza
+Description: This early photograph, titled as dating from 1880, shows the Great Sphinx of Giza when much of its lion-shaped body and surrounding enclosure remained buried beneath desert sand. Its weathered human face and striped headdress dominate the frame, while numerous people pose around the chest, paws, and head, emphasizing the monument’s immense scale. A pyramid is visible in the background. The image offers a striking view of the Sphinx before modern clearing and conservation transformed its immediate setting, and it reflects the growing nineteenth-century interest in photographing Egypt’s ancient monuments.
+Origin: Giza Plateau, Egypt.
+Build time / period: Generally attributed to Egypt’s Old Kingdom, around the 26th century BCE, although its precise dating remains debated.
+Purpose: Usually interpreted as a royal guardian monument associated with the nearby pyramid complex.
+Significance: One of ancient Egypt’s most recognizable monuments and among the world’s largest surviving monolithic sculptures.
+Historical / cultural context: The user-provided title dates the photograph to 1880. At that time, the Sphinx was still substantially surrounded by accumulated sand, before later large-scale excavations exposed more of its body and enclosure.
+Observed details:
+- A colossal human-headed lion monument dominates the scene
+- The body and surrounding enclosure are heavily covered by sand
+- Several people pose beside and on the monument for scale
+- A pyramid rises in the background
+- The photograph is monochrome and visibly aged
+Identification note: The distinctive human head, lion body, desert setting, and nearby pyramid match the Great Sphinx, consistent with the user-provided title.`,
+      beforeImage: 'showcase/Great-Sphinx-1880.jpg',
+      afterImage: 'showcase/Great-Sphinx-1880-after.png'
     }
   ];
 
